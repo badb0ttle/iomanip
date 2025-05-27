@@ -6,22 +6,22 @@ using namespace std;
 #define pr printf
 const int mx=2e5+1;
 const int inf=1e9;
-mt19937 sj(1919810);
+mt19937 sj(1919810);//随机数
 struct node{
     int l,r;
     int sz,v,key;
 }fhq[mx];
 int idx,root,T1,T2,T3;
-int build(int v)
+int build(int v)//建树
 {
     fhq[++idx]={0,0,1,v,(int)sj()};
     return idx;
 }
-void pushup(int v)
+void pushup(int v)//更新节点
 {
     fhq[v].sz=fhq[fhq[v].l].sz+fhq[fhq[v].r].sz+1;
 }
-void split(int u,int v,int&x,int&y)
+void split(int u,int v,int&x,int&y)//从u节点分解成两棵树(两个区间)
 {
     if(!u)
     {
@@ -40,7 +40,7 @@ void split(int u,int v,int&x,int&y)
     }
     pushup(u);
 }
-int merge(int x,int y)
+int merge(int x,int y)//合并区间
 {
     if(!x||!y) return x+y;
     if(fhq[x].key<fhq[y].key)
@@ -56,26 +56,26 @@ int merge(int x,int y)
         return y;
     }
 }
-void ins(int v)
+void ins(int v)//插入节点
 {
     split(root,v,T1,T2);
     root=merge(merge(T1,build(v)),T2);
 }
-void del(int v)
+void del(int v)//删除节点
 {
     split(root, v, T1, T2);
     split(T1, v-1, T1, T3);
     if (T3) T3 = merge(fhq[T3].l, fhq[T3].r);
     root = merge(merge(T1, T3), T2);
 }
-int gr(int v)
+int gr(int v)//获取值为v的节点排名
 {
     split(root, v - 1, T1, T2);
     int res = fhq[T1].sz;
     root = merge(T1, T2);
     return res + 1;
 }
-int kth(int k)
+int kth(int k)//获取第k大的节点值
 {
     int u = root;
     while (u)
@@ -95,7 +95,7 @@ int kth(int k)
     }
     return fhq[u].v;
 }
-int gpre(int v)
+int gpre(int v)//获取节点v的上一个节点
 {
     split(root, v - 1, T1, T2);
     int u = T1;
@@ -108,7 +108,7 @@ int gpre(int v)
     root = merge(T1, T2);
     return fhq[u].v;
 }
-int gnext(int v)
+int gnext(int v)//获取节点v的下一个节点
 {
     split(root, v, T1, T2);
     int u = T2;
@@ -121,21 +121,21 @@ int gnext(int v)
     root = merge(T1, T2);
     return fhq[u].v;
 }
-int getmx()
+int getmx()//获取最大值
 {
     int u = root;
     while (fhq[u].r)
         u = fhq[u].r;
     return fhq[u].v;
 }
-int getmn()
+int getmn()//获取最小值
 {
     int u = root;
     while (fhq[u].l)
         u = fhq[u].l;
     return fhq[u].v;
 }
-bool vis(int v) {
+bool vis(int v) {//判断某个节点是否存在
     split(root, v, T1, T2);
     split(T1, v - 1, T1, T3);
     bool exist = (T3 != 0);

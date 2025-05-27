@@ -8,8 +8,9 @@ using namespace std;
 #define debug(x) cout << #x << '=' << x << '\n'
 const int mx = 2e5 + 9;
 const ll inf=2e18;
-ll n, q, a[mx], op;
+ll n, q, a[mx], op;//极值线段树
 ll tMax[mx << 2], tMin[mx << 2], lz[mx << 2];
+
 void update(ll s, ll e, ll o, ll x)
 {
     tMax[o] += x, tMin[o] += x, lz[o] += x;

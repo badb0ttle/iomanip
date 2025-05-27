@@ -7,7 +7,7 @@ using namespace std;
 #define PII pair<int, int>
 #define debug(x) cout << #x << '=' << x << '\n'
 const int mx = 2e5 + 9;
-ll n, q, a[mx], op;
+ll n, q, a[mx], op;//异或线段树
 ll t[mx << 2], lz[mx << 2];
 void update(ll s, ll e, ll o, ll x)
 {

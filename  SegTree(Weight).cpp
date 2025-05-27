@@ -7,7 +7,7 @@ using namespace std;
 #define PII pair<int,int>
 #define debug(x) cout<<#x<<'='<<x<<'\n'
 const int mx=2e5+1;
-ll q,op,l,r,x,t[mx<<2],n=mx;
+ll q,op,l,r,x,t[mx<<2],n=mx;//非可持续性权值线段树
 void pushup(int v)
 {
     t[v]=t[v<<1]+t[v<<1|1];
@@ -20,7 +20,7 @@ void insert(ll v,ll s=1,ll e=n,ll o=1)
     else insert(v,mid+1,e,o<<1|1);
     pushup(o);
 }
-ll queryCnt(ll l,ll r,ll s=1,ll e=n,ll o=1)
+ll queryCnt(ll l,ll r,ll s=1,ll e=n,ll o=1)//查询大小在[l,r]的元素的个数之和
 {
     if(l<=s&&r>=e)return t[o];
     ll mid=(s+e)>>1;
@@ -29,7 +29,7 @@ ll queryCnt(ll l,ll r,ll s=1,ll e=n,ll o=1)
     if(max(mid+1,l)<=min(r,e))res+=queryCnt(l,r,mid+1,e,o<<1|1);
     return res;
 }
-ll queryVal(ll k,ll s=1,ll e=n,ll o=1)
+ll queryVal(ll k,ll s=1,ll e=n,ll o=1)//查询集合中kth小的元素
 {
     if(s==e)return s;
     ll ls=t[o<<1];

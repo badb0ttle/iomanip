@@ -14,25 +14,25 @@ struct node
     bool rev;
 } fhq[mx];
 int cnt, root;
-int build(int v)
+int build(int v)//建树
 {
     fhq[++cnt].v = v;
     fhq[cnt].key = sj();
     fhq[cnt].sz = 1;
     return cnt;
 }
-void pushup(int u)
+void pushup(int u)//更新节点
 {
     fhq[u].sz = fhq[fhq[u].l].sz + fhq[fhq[u].r].sz + 1;
 }
-void pushdown(int u)
+void pushdown(int u)//更新标记
 {
     swap(fhq[u].l, fhq[u].r);
     fhq[fhq[u].l].rev ^= 1;
     fhq[fhq[u].r].rev ^= 1;
     fhq[u].rev = false;
 }
-void split(int u, int siz, int &x, int &y)
+void split(int u, int siz, int &x, int &y)//从u节点分裂成两棵树(两个区间)
 {
     if (!u)
         x = y = 0;
@@ -53,7 +53,7 @@ void split(int u, int siz, int &x, int &y)
         pushup(u);
     }
 }
-int merge(int x, int y)
+int merge(int x, int y)//合并x,y节点的树(区间合并)
 {
     if (!x || !y)
         return x + y;
@@ -74,7 +74,7 @@ int merge(int x, int y)
         return y;
     }
 }
-void rev(int l, int r)
+void rev(int l, int r)//区间反转
 {
     int x, y, z;
     split(root, l - 1, x, y);
@@ -82,7 +82,6 @@ void rev(int l, int r)
     fhq[y].rev ^= 1;
     root = merge(merge(x, y), z);
 }
-
 void work()
 {
     

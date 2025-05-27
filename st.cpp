@@ -9,6 +9,9 @@ const ll inf = 2e18;
 const int T = 18;
 ll stMax[N][20], stMin[N][20], stGcd[N][20];
 ll a[N];
+int gcd(int a, int b) {
+    return b == 0 ? a : gcd(b, a % b);
+}
 ll getMax(int l, int r)
 {
    int k = log(r - l + 1) / log(2);
@@ -22,7 +25,7 @@ ll getMin(int l, int r)
 ll getGcd(int l, int r)
 {
    int k = log(r - l + 1) / log(2);
-   return __gcd(stGcd[l][k], stGcd[r - (1 << k) + 1][k]);
+   return gcd(stGcd[l][k], stGcd[r - (1 << k) + 1][k]);
 }
 
 void work()

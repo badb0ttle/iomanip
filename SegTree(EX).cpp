@@ -34,6 +34,7 @@ void build(ll s = 1, ll e = n, ll o = 1)
     mul[o]=1;
     if (s == e)
         return t[o] = a[s]%mod, void(); // 线段树就是个完全二叉树，底层的叶子节点对应数组元素，所以它的值就是 a[s]。
+        //如果题目有要求要取模，那么只需要在a[s]处取模即可return t[o] = a[s], void();
     ll mid = (s + e) >> 1;
     build(s, mid, o << 1), build(mid + 1, e, o << 1 | 1);
     pushup(o);

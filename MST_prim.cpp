@@ -45,7 +45,7 @@ void work()
         {
             if(!intree[y]&&d[y]>w)
             {
-                d[y]=w;
+                d[y]=w; 
                 pq.push({y,w});
             }
         }
