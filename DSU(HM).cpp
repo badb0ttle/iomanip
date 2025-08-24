@@ -43,7 +43,7 @@ typedef pair<ll, ll>PAIR;
 int pre[N],sz[N],a[N];
 int find(int x)
 {
-    return pre[x]==x?x:find(pre[x]);
+    return pre[x] = (pre[x]==x ? x : find(pre[x]));
 }
 void merge(int x,int y)
 {

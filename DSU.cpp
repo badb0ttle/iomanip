@@ -8,7 +8,7 @@ const int mx=2e5+1;
 ll pre[mx];
 int root(int v)
 {
-    return (pre[v]==v?v:root(pre[v]));
+    return pre[v]=(pre[v]==v?v:root(pre[v]));
 }
 void merge(int a,int b)
 {
