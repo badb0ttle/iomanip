@@ -35,7 +35,7 @@ using namespace std;
 #define debug(x) cout << #x << " = " << (x) << endl;
 #define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
 const ll N = 3e3 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
-const ull INF = 1e18;
+const ll INF = 1e18;
 const double pie = acos(-1), eps = 1e-8;
 int dir[] = {0, 1, 0, -1, 0};
 const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};

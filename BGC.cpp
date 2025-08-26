@@ -34,90 +34,57 @@ using namespace std;
 #define endl "\n"
 #define debug(x) cout << #x << " = " << (x) << endl;
 #define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
-const ll N = 5e3 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
 const ull INF = 1e18;
 const double pie = acos(-1), eps = 1e-8;
 int dir[] = {0, 1, 0, -1, 0};
 const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
 const int dy[] = {1, 0, -1, -1, 0, 1, -1};
 typedef pair<ll, ll> PAIR;
-//差分约束系统
-struct Edge
+int col[N];
+vector<int> g[N];
+bool dfs(int x)
 {
-    ll x, w;
-};
-vector<Edge> g[N];
-ll n, d[N];
-bool spfa()
-{
-    for(int i=1;i<=n;++i)d[i]=INF;
-    bitset<N>inq;
-    queue<int>q;
-    q.push(0);
-    inq[0]=1;
-    vector<int>cnt(n+1);
-    while(!q.empty()){
-        int x=q.front();
-        q.pop();
-        inq[x]=0;
-        for(const auto &[y,w]:g[x]){
-            if(d[y]>d[x]+w){
-                if(++cnt[y]>=n)return 0;
-                d[y]=d[x]+w;
-                if(!inq[y])q.push(y),inq[y]=1;
-            }
+    for(const auto &y:g[x])
+    {
+        if(col[y]==-1)
+        {
+            col[y]=col[x]^1;
+            if(!dfs(y))return 0;
         }
-     }
+        else if(col[y]==col[x])return 0;
+    }
     return 1;
 }
 void solve()
 {
-    int m;
+    int n, m;
     cin >> n >> m;
-    for (int i = 0; i <= n; ++i)
-        g[i].clear();
     for (int i = 1; i <= m; ++i)
     {
-        int op;
-        cin >> op;
-        ll x, y, w;
-        if (op == 1)
-        {
-            cin >> x >> y >> w;
-            g[y].pb({x, w});
-        }
-        else if (op == 2)
-        {
-            cin >> x >> y >> w;
-            g[x].pb({y, -w});
-        }
-        else
-        {
-            cin >> x >> y;
-            g[x].pb({y, 0});
-            g[y].pb({x, 0});
-        }
+        int x, y;
+        cin >> x >> y;
+        g[x].pb(y);
+        g[y].pb(x);
     }
-    // 2.建立虚拟源点
     for (int i = 1; i <= n; ++i)
-        g[0].pb({i, 0});
-    if(spfa()){
-        //不存在负环
-        cout<<"YES\n";
-        // for(int i=1;i<=n;++i)
-        //     cout<<d[i]-d[1]<<" \n"[i==n];
-    }
-    else
+        col[i] = -1;
+    bool ans = 1;
+    for(int i=1;i<=n;++i)
     {
-        cout<<"NO\n";
+        if(col[i]==-1)
+        {
+            col[i]=0;
+            ans&=dfs(i);
+        }
     }
-
+    cout << (ans ? "YES" : "NO") << '\n';
 }
 signed main()
 {
     io;
     ll _ = 1;
-    cin >> _;
+    // cin >> _;
     while (_--)
         solve();
     return 0;
