@@ -1,100 +1,108 @@
+/*🫵😉👍*/
 #include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
 using namespace std;
-
-// 常用宏定义和类型定义
 #define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
 #define re register
+#define il inline
 #define fi first
+#define SZ(x) ((int)(x).size())
 #define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
 #define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
 #define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
-
-const ll N = 2e5 + 100;
-typedef pair<ll, ll> PAIR;
-
-// 图的邻接表
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<int, int> PAIR;
+int fa[N], dep[N];
+const int T = 20;
 vector<int> g[N];
-
-// 并查集数组
-int pre[N];
-// 节点深度
-int dep[N];
-// LCA 查询答案
-int ans[N];
-// 父节点记录
-int fa[N];
-
-// 查询容器，Q[u] 存放所有和 u 查询的点和对应查询编号
+// Tarjan求lca
+int pre[N], ans[N];
+int root(int x) { return pre[x] = (pre[x] == x ? x : root(pre[x])); }
 vector<PAIR> Q[N];
-
-// 节点访问标记
 bitset<N> vis;
-
-// 并查集查找操作，路径压缩
-int find(int x) {
-    return pre[x] == x ? x : pre[x] = find(pre[x]);
-}
-
-// 并查集合并操作，将 x 所在集合与 y 所在集合合并
-void merge(int x, int y) {
-    int fx = find(x), fy = find(y);
-    if (dep[x] < dep[y]) swap(fx, fy);
+void merge(int x, int y)
+{
+    // 深度大到深度小
+    int fx = root(x), fy = root(y);
+    if (dep[fx] < dep[fy])
+        swap(fx, fy);
     pre[fx] = fy;
 }
-
-// Tarjan+并查集 LCA 求解
-void dfs(int x) {
-    dep[x] = dep[fa[x]] + 1; // 记录当前节点深度
-    vis[x] = 1;              // 标记当前节点已访问
-
-    // 遍历子节点
-    for (const auto& y : g[x]) dfs(y);
-
-    // 遍历和 x 有查询关系的点
-    for (const auto& [y, id] : Q[x]) {
-        if (!vis[y]) continue;        // 如果 y 还未访问，跳过
-        ans[id] = find(y);            // 否则，查询 LCA 并记录答案
+void dfs(int x)
+{
+    dep[x] = dep[fa[x]] + 1;
+    vis[x] = 1;
+    // 1.处理儿子
+    for (const auto &y : g[x])
+        dfs(y);
+    // 2.处理自己的询问
+    for (const auto &[y, i] : Q[x])
+    {
+        if (!vis[y])
+            continue;
+        ans[i] = root(y);
     }
-
-    // 将当前节点和它父亲合并
     merge(x, fa[x]);
 }
-
-// 主流程
-void solve() {
+void solve()
+{
     int n;
     cin >> n;
-
-    // 并查集初始化，每个点是自己父亲
-    for (int i = 1; i <= n; ++i) pre[i] = i;
-
-    // 读入树结构
-    for (int i = 2; i <= n; ++i) {
+    for (int i = 1; i <= n; ++i)
+        pre[i] = i;
+    for (int i = 2; i <= n; ++i)
+    {
         cin >> fa[i];
-        g[fa[i]].push_back(i);
+        g[fa[i]].pb(i);
     }
-
     int q;
     cin >> q;
-
-    // 读入所有 LCA 查询
-    for (int i = 1; i <= q; ++i) {
+    for (int i = 1; i <= q; ++i)
+    {
         int x, y;
         cin >> x >> y;
-        Q[x].push_back({y, i});
-        Q[y].push_back({x, i});
+        Q[x].pb({y, i});
+        Q[y].pb({x, i});
     }
-
-    // 从根节点 1 开始 DFS
     dfs(1);
-
-    // 输出答案
-    for (int i = 1; i <= q; ++i) cout << ans[i] << '\n';
+    for (int i = 1; i <= q; ++i)
+        cout << ans[i] << '\n';
 }
-
-signed main() {
+signed main()
+{
     io;
     ll _ = 1;
-    while (_--) solve();
+    // cin >> _;
+    while (_--)
+        solve();
     return 0;
 }

@@ -1,77 +1,92 @@
-/* 倍增最近公共祖先 LCA 模板
-   复杂度：
-     - 预处理 dfs + 倍增表：O(n log n)
-     - 单次查询：O(log n)
-*/
-
+/*🫵😉👍*/
 #include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
 using namespace std;
 #define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
 #define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
-
-const int N = 2e5 + 100;
-const int T = 20;   // 倍增最大幂次，log2(N) 向上取整即可
-vector<int> g[N];   // 存图（树）
-
-int fa[N][T + 1];   // fa[i][j] 表示 i 节点往上跳 2^j 个祖先
-int dep[N];         // dep[i] 表示 i 节点深度
-
-// dfs 预处理 fa 和 dep
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+int fa[N][30],dep[N];
+const int T=20;
+vector<int>g[N];
+//倍增求lca
 void dfs(int x)
 {
-    // 先处理当前点的深度
-    dep[x] = dep[fa[x][0]] + 1;
-
-    // 倍增预处理 fa[x][i]
-    for (int i = 1; i <= T; ++i)
-        fa[x][i] = fa[fa[x][i - 1]][i - 1];
-
-    // 遍历子节点，递归 dfs
-    for (const auto &y : g[x])
+    dep[x]=dep[fa[x][0]]+1;
+    for(int i=1;i<=T;++i)
+    {
+        fa[x][i]=fa[fa[x][i-1]][i-1];
+    }
+    for(const auto&y:g[x])
+    {
         dfs(y);
+    }
 }
-
-// 查询 x 和 y 的最近公共祖先 LCA
-int lca(int x, int y)
+int lca(int x,int y)
 {
-    // 让 x 深度 >= y
-    if (dep[x] < dep[y])
-        swap(x, y);
+    if(dep[x]<dep[y])swap(x,y);
+    //使得dep[x]>=dep[y]
+    for(int i=T;i>=0;--i)
+    {
+        if(dep[fa[x][i]]>=dep[y])x=fa[x][i];
 
-    // 使 x 和 y 跳到同一深度
-    for (int i = T; i >= 0; --i)
-        if (dep[fa[x][i]] >= dep[y])
-            x = fa[x][i];
-
-    // 如果已经相等，直接返回
-    if (x == y)
-        return x;
-
-    // 倍增一起往上跳，直到相等
-    for (int i = T; i >= 0; --i)
-        if (fa[x][i] != fa[y][i])
-            x = fa[x][i], y = fa[y][i];
-
-    // 返回公共祖先
+    }
+    if(x==y)return x;
+    for(int i=T;i>=0;--i)
+    {
+        if(fa[x][i]!=fa[y][i])
+        {
+            x=fa[x][i];
+            y=fa[y][i];
+        }
+    }
     return fa[x][0];
 }
-
 void solve()
 {
     int n;
     cin >> n;
-
-    // 读入树结构，记录父亲
     for (int i = 2; i <= n; ++i)
     {
-        cin >> fa[i][0];            // fa[i][0] 表示 i 的父亲
-        g[fa[i][0]].push_back(i);   // 建树
+        cin >> fa[i][0];
+        g[fa[i][0]].pb(i);
     }
-
-    // 以 1 为根 dfs 预处理
     dfs(1);
-
-    // 处理 q 次查询
     int q;
     cin >> q;
     while (q--)
@@ -81,10 +96,12 @@ void solve()
         cout << lca(x, y) << '\n';
     }
 }
-
 signed main()
 {
     io;
-    solve();
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
     return 0;
 }
