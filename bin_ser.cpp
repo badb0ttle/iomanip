@@ -12,7 +12,7 @@ void work()
 	while(q--)
 	{
 		int x;std::cin>>x;
-		int l=0,r=n;
+		int l=0,r=n+1;
 		while(l+1!=r)
 		{
 			int mid=(l+r)>>1;
