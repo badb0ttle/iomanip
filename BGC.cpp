@@ -41,18 +41,21 @@ int dir[] = {0, 1, 0, -1, 0};
 const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
 const int dy[] = {1, 0, -1, -1, 0, 1, -1};
 typedef pair<ll, ll> PAIR;
+// check二分图
 int col[N];
 vector<int> g[N];
 bool dfs(int x)
 {
-    for(const auto &y:g[x])
+    for (const auto &y : g[x])
     {
-        if(col[y]==-1)
+        if (col[y] == -1)
         {
-            col[y]=col[x]^1;
-            if(!dfs(y))return 0;
+            col[y] = col[x] ^ 1;
+            if (!dfs(y))
+                return 0;
         }
-        else if(col[y]==col[x])return 0;
+        else if (col[y] == col[x])
+            return 0;
     }
     return 1;
 }
@@ -70,12 +73,12 @@ void solve()
     for (int i = 1; i <= n; ++i)
         col[i] = -1;
     bool ans = 1;
-    for(int i=1;i<=n;++i)
+    for (int i = 1; i <= n; ++i)
     {
-        if(col[i]==-1)
+        if (col[i] == -1)
         {
-            col[i]=0;
-            ans&=dfs(i);
+            col[i] = 0;
+            ans &= dfs(i);
         }
     }
     cout << (ans ? "YES" : "NO") << '\n';

@@ -41,6 +41,7 @@ int dir[]={0,1,0,-1,0};
 const int dx[]={1,1,1,0,0,-1,-1,-1};
 const int dy[]={1,0,-1,-1,0,1,-1};
 typedef pair<ll, ll>PAIR;
+//启发式合并
 int n,q;
 set<int>st[N];
 void solve(){
