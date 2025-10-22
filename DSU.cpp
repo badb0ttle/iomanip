@@ -15,7 +15,7 @@ void merge(int a,int b)
     pre[root(a)]=root(b);
 }
 bool same(int a,int b)
-{
+{   
     return root(a)==root(b);
 }
 void work()
