@@ -1,9 +1,9 @@
-#include <iostream>
-#include <ctime>
+/*ordinary.exe*/
+#include <bits/stdc++.h>
 using namespace std;
+using i64=long long;
+using u64=unsigned long long;
 using i128 = __int128;
-
-// 快速幂 (a^b mod n)
 i128 qpow(i128 a, i128 b, i128 mod) {
     i128 res = 1;
     a %= mod;
@@ -14,8 +14,6 @@ i128 qpow(i128 a, i128 b, i128 mod) {
     }
     return res;
 }
-
-// Miller-Rabin 素性测试
 bool MillerRabin(i128 n, int k = 10) {
     if (n < 2) return false;
     if (n == 2 || n == 3) return true;
@@ -47,8 +45,6 @@ bool MillerRabin(i128 n, int k = 10) {
     }
     return true;
 }
-
-// 输出 __int128 类型
 void print_i128(i128 n) {
     if (n == 0) {
         putchar('0');
@@ -64,21 +60,17 @@ void print_i128(i128 n) {
         putchar(buf[i]);
     putchar('\n');
 }
-
+void work()
+{
+    i64 x;
+    while(cin>>x)
+        cout<<(MillerRabin(x)?"Y\n":"N\n");
+}
 int main() {
-    i128 n = 1;
-    for (int i = 0; i < 28; ++i) n *= 10;
-    n -= 1;
-
-    // 从 n 开始，往下找第一个质数
-    while (true) {
-        if (MillerRabin(n)) {
-            cout << "找到 1e28 以下最大质数：" << endl;
-            print_i128(n);
-            break;
-        }
-        n -= 2; // 只检查奇数
-    }
-
-    return 0;
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t=1;
+// cin >> t;
+while(t--)
+work();
 }

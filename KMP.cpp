@@ -1,47 +1,48 @@
-/*blank*/
-#include<bits/stdc++.h>
+/*ordinary.exe*/
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long//一时偷懒不收敛，乱开ll终遭谴
-#define sc scanf
-#define pr printf
-#define PII pair<int,int>
-#define debug(x) cout<<#x<<'='<<x<<'\n'
-const int mx=1e6+9;
-char s[mx],t[mx];
+using i64 = long long;
+using u64 = unsigned long long;
+const int mx = 1e6 + 9;
+char s[mx], t[mx];
+string str, tstr;
 int nex[mx];
 void work()
 {
-    cin>>s+1>>t+1;
-    int n=strlen(s+1),m=strlen(t+1);
-    s[n+1]='#',t[m+1]='$';
-    //getnex
-    nex[1]=0;
-    for(int i=2,j=0;i<=m;++i)
+    cin >> tstr >> str;
+    int n = str.size(), m = tstr.size();
+    for (int i = 1; i <= n; ++i)
+        s[i] = str[i - 1];
+    for (int i = 1; i <= m; ++i)
+        t[i] = tstr[i - 1];
+    s[n + 1] = '#', t[m + 1] = '$';
+    // getnex
+    nex[1] = 0;
+    for (int i = 2, j = 0; i <= m; ++i)
     {
-        while(j&&t[i]!=t[j+1])j=nex[j];
-        if(t[i]==t[j+1])j++;
-        nex[i]=j;
+        while (j && t[i] != t[j + 1])
+            j = nex[j];
+        if (t[i] == t[j + 1])
+            j++;
+        nex[i] = j;
     }
-    for(int i=1,j=0;i<=n;++i)
+    for (int i = 1, j = 0; i <= n; ++i)
     {
-        while(j&&t[j+1]!=s[i])j=nex[j];
-        if(t[j+1]==s[i])j++;
-        if(j==m)
-        {
-            cout<<i-j+1<<' ';
-        }
+        while (j && t[j + 1] == s[i])
+            j = nex[j];
+        if (t[j + 1] == s[i])
+            j++;
     }
-    cout<<'\n';
-    for(int i=1;i<=m;++i)cout<<nex[i]<<' ';
+    for (int i = 1; i <= m; ++i)
+        cout << nex[i] << ' ';
+    cout << '\n';
 }
 int main()
 {
-ios::sync_with_stdio(0);
-cin.tie(0);
-cout.tie(0);
-int _=1;
-//cin >> _;
-//sc("%d",&_);
-while (_--)work();
-return 0;
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
 }

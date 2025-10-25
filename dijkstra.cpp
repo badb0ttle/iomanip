@@ -1,19 +1,18 @@
-/*blank*/
-#include<bits/stdc++.h>
+/*ordinary.exe*/
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long//一时偷懒不收敛，乱开ll终遭谴
-#define sc scanf
-#define pr printf
+using i64=long long;
+using u64=unsigned long long;
 const int mx=2e5+1;
-const ll inf=4e18;
+const i64 inf=4e18;
 struct edge{
-ll v,w;
+i64 v,w;
 bool operator <(const edge&a)const{
     return w==a.w?v<a.v:w>a.w;
 }
 };
 vector<edge>g[mx];
-ll dp[mx];
+i64 dp[mx];
 void dijkstra(int st)
 {
     bitset<mx>vis;
@@ -23,7 +22,7 @@ void dijkstra(int st)
     qp.push({st,0});
     while(qp.size())
     {
-        ll x=qp.top().v;
+        i64 x=qp.top().v;
         qp.pop();
         if(vis[x])continue;
         vis[x]=1;
@@ -36,16 +35,21 @@ void dijkstra(int st)
 }
 void work()
 {
-    
+    int n,m,s,t;cin>>n>>m>>s>>t;
+    for(int i=1;i<=m;++i)
+    {
+        int u,v,w;cin>>u>>v>>w;
+        g[u].push_back({v,w});
+        g[v].push_back({u,w});
+    }
+    dijkstra(s);
+    cout<<dp[t]<<'\n';
 }
-int main()
-{
+int main() {
 ios::sync_with_stdio(0);
 cin.tie(0);
-cout.tie(0);
-int _=1;
-//cin >> _;
-//sc("%d",&_);
-while (_--)work();
-return 0;
+int t=1;
+// cin >> t;
+while(t--)
+work();
 }

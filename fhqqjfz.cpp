@@ -1,9 +1,8 @@
-/*blank*/
-#include<bits/stdc++.h>
+/*ordinary.exe*/
+#include <bits/stdc++.h>
 using namespace std;
-#define ll long long//一时偷懒不收敛，乱开ll终遭谴
-#define sc scanf
-#define pr printf
+using i64 = long long;
+using u64 = unsigned long long;
 const int mx = 2e5 + 5;
 mt19937 sj(1919810);
 struct node
@@ -14,25 +13,30 @@ struct node
     bool rev;
 } fhq[mx];
 int cnt, root;
-int build(int v)//建树
+int build(int v) // 建树
 {
     fhq[++cnt].v = v;
     fhq[cnt].key = sj();
     fhq[cnt].sz = 1;
     return cnt;
 }
-void pushup(int u)//更新节点
+void pushup(int u) // 更新节点
 {
-    fhq[u].sz = fhq[fhq[u].l].sz + fhq[fhq[u].r].sz + 1;
+    fhq[u].sz = (fhq[u].l ? fhq[fhq[u].l].sz : 0) + (fhq[u].r ? fhq[fhq[u].r].sz : 0) + 1;
 }
-void pushdown(int u)//更新标记
+void pushdown(int u) // 更新标记
 {
-    swap(fhq[u].l, fhq[u].r);
-    fhq[fhq[u].l].rev ^= 1;
-    fhq[fhq[u].r].rev ^= 1;
-    fhq[u].rev = false;
+    if (fhq[u].rev)
+    {
+        swap(fhq[u].l, fhq[u].r);
+        if (fhq[u].l)
+            fhq[fhq[u].l].rev ^= 1;
+        if (fhq[u].r)
+            fhq[fhq[u].r].rev ^= 1;
+        fhq[u].rev = 0;
+    }
 }
-void split(int u, int siz, int &x, int &y)//从u节点分裂成两棵树(两个区间)
+void split(int u, int siz, int &x, int &y) // 从u节点分裂成两棵树(两个区间)
 {
     if (!u)
         x = y = 0;
@@ -40,10 +44,11 @@ void split(int u, int siz, int &x, int &y)//从u节点分裂成两棵树(两个�
     {
         if (fhq[u].rev)
             pushdown(u);
-        if (fhq[fhq[u].l].sz < siz)
+        int lsz = fhq[u].l ? fhq[fhq[u].l].sz : 0;
+        if (lsz < siz)
         {
             x = u;
-            split(fhq[u].r, siz - fhq[fhq[u].l].sz - 1, fhq[u].r, y);
+            split(fhq[u].r, siz - lsz - 1, fhq[u].r, y);
         }
         else
         {
@@ -53,7 +58,7 @@ void split(int u, int siz, int &x, int &y)//从u节点分裂成两棵树(两个�
         pushup(u);
     }
 }
-int merge(int x, int y)//合并x,y节点的树(区间合并)
+int merge(int x, int y) // 合并x,y节点的树(区间合并)
 {
     if (!x || !y)
         return x + y;
@@ -74,7 +79,7 @@ int merge(int x, int y)//合并x,y节点的树(区间合并)
         return y;
     }
 }
-void rev(int l, int r)//区间反转
+void rev(int l, int r) // 区间反转
 {
     int x, y, z;
     split(root, l - 1, x, y);
@@ -84,16 +89,39 @@ void rev(int l, int r)//区间反转
 }
 void work()
 {
-    
+    int n, m;
+    cin >> n >> m;
+    root = 0;
+    cnt = 0;
+    for (int i = 1; i <= n; i++)
+        root = merge(root, build(i));
+    while (m--)
+    {
+        int l, r;
+        cin >> l >> r;
+        rev(l, r);
+    }
+    vector<int> res;
+    auto dfs = [&](auto self,int u)->void
+    {
+        if (!u)
+            return;
+        if (fhq[u].rev)
+            pushdown(u);
+        self(self,fhq[u].l);
+        res.push_back(fhq[u].v);
+        self(self,fhq[u].r);
+    };
+    dfs(dfs,root);
+    for (int i = 0; i < n; i++)
+        cout << res[i] << " \n"[i == n - 1];
 }
 int main()
 {
-ios::sync_with_stdio(0);
-cin.tie(0);
-cout.tie(0);
-int _=1;
-//cin >> _;
-//sc("%d",&_);
-while (_--)work();
-return 0;
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
 }
