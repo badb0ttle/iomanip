@@ -1,0 +1,6287 @@
+📘 Algorithm Template Collection
+==============================
+
+1. AC-Automaton.cpp
+2. Bellman-Ford.cpp
+3. Bezouts.cpp
+4. BGC(Dinic).cpp
+5. BGC(KM).cpp
+6. bin_ser.cpp
+7. BinIdxTree.cpp
+8. BST.cpp
+9. Discrt.cpp
+10. DP(01K).cpp
+11. DP(BK).cpp
+12. DP(Tree).cpp
+13. DP(UK).cpp
+14. DSU.cpp
+15. DSU(HM).cpp
+16. DSU(RB).cpp
+17. DSU(Weight).cpp
+18. Exgcd.cpp
+19. FHQ.cpp
+20. FHQQJFZ.cpp
+21. Floyd.cpp
+22. gaojindu(add).cpp
+23. gaojindu(sup).cpp
+24. getTreeDia.cpp
+25. HLD.cpp
+26. HM.cpp
+27. I128.cpp
+28. Johnson.cpp
+29. kbase.cpp
+30. KMP.cpp
+31. LCA.cpp
+32. LCA(HLD).cpp
+33. LCA(Tarjan).cpp
+34. Lucas.cpp
+35. Manacher.cpp
+36. MathGeo.cpp
+37. Max-flow.cpp
+38. Miller-Rabin.cpp
+39. mod.cpp
+40. MST_kruskal.cpp
+41. MST_prim.cpp
+42. MST.cpp
+43. OpOverload.cpp
+44. PST.cpp
+45. qp&sm.cpp
+46. regex.cpp
+47. SDC.cpp
+48. SegTree(add).cpp
+49. SegTree(EX).cpp
+50. SegTree(MaxMin).cpp
+51. SegTree(Weight).cpp
+52. SegTree(XOR).cpp
+53. SG.cpp
+54. Sort.cpp
+55. st.cpp
+56. StressTest.cpp
+57. String-Hash.cpp
+58. Tarjan(DG_SCC).cpp
+59. Tarjan(UDG_B).cpp
+60. Tarjan(UDG_CV).cpp
+61. Tarjan(UDG_Cycle).cpp
+62. tddif.cpp
+63. Trie(01).cpp
+64. Trie(prefix).cpp
+65. Trie(string).cpp
+66. Year.cpp
+67.MathGeo.cpp
+
+==============================
+Templates Content
+==============================
+
+
+
+1. AC-Automaton.cpp
+------------------
+#include <bits/stdc++.h>
+
+using i64 = long long;
+
+struct AhoCorasick {
+    static constexpr int ALPHABET = 26;
+    struct Node {
+        int len;
+        int link;
+        std::array<int, ALPHABET> next;
+        Node() : len{0}, link{0}, next{} {}
+    };
+    
+    std::vector<Node> t;
+    
+    AhoCorasick() {
+        init();
+    }
+    
+    void init() {
+        t.assign(2, Node());
+        t[0].next.fill(1);
+        t[0].len = -1;
+    }
+    
+    int newNode() {
+        t.emplace_back();
+        return t.size() - 1;
+    }
+    
+    int add(const std::string &a) {
+        int p = 1;
+        for (auto c : a) {
+            int x = c - 'a';
+            if (t[p].next[x] == 0) {
+                t[p].next[x] = newNode();
+                t[t[p].next[x]].len = t[p].len + 1;
+            }
+            p = t[p].next[x];
+        }
+        return p;
+    }
+    
+    void work() {
+        std::queue<int> q;
+        q.push(1);
+        
+        while (!q.empty()) {
+            int x = q.front();
+            q.pop();
+            
+            for (int i = 0; i < ALPHABET; i++) {
+                if (t[x].next[i] == 0) {
+                    t[x].next[i] = t[t[x].link].next[i];
+                } else {
+                    t[t[x].next[i]].link = t[t[x].link].next[i];
+                    q.push(t[x].next[i]);
+                }
+            }
+        }
+    }
+    
+    int next(int p, int x) {
+        return t[p].next[x];
+    }
+    
+    int link(int p) {
+        return t[p].link;
+    }
+    
+    int len(int p) {
+        return t[p].len;
+    }
+    
+    int size() {
+        return t.size();
+    }
+};
+
+
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    
+    int n;
+    std::cin >> n;
+    
+    AhoCorasick ac;
+    
+    std::vector<std::string> t(n);
+    std::vector<int> end(n);
+    for (int i = 0; i < n; i++) {
+        std::cin >> t[i];
+        end[i] = ac.add(t[i]);
+    }
+    ac.work();
+    
+    std::string s;
+    std::cin >> s;
+    
+    int p = 1;
+    std::vector<int> f(ac.size());
+    for (auto c : s) {
+        p = ac.next(p, c - 'a');
+        f[p]++;
+    }
+    
+    std::vector<std::vector<int>> adj(ac.size());
+    for (int i = 2; i < ac.size(); i++) {
+        adj[ac.link(i)].push_back(i);
+    }
+    
+    auto dfs = [&](auto self, int x) -> void {
+        for (auto y : adj[x]) {
+            self(self, y);
+            f[x] += f[y];
+        }
+    };
+    dfs(dfs, 1);
+    
+    for (int i = 0; i < n; i++) {
+        std::cout << f[end[i]] << "\n";
+    }
+    
+    return 0;
+}
+
+2. Bellman-Ford.cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 1e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+struct Edge
+{
+    ll x, w;
+};
+vector<Edge> g[N];
+ll d[N], n, m;
+// 判断是否存在负环
+bool spfa(int st)
+{
+    // 1.初始化
+    for (int i = 1; i <= n; ++i)
+        d[i] = INF;
+    d[st] = 0;
+    queue<int> q;
+    bitset<N> inq;
+    q.push(st);
+    inq[st]=1;
+    vector<int> cnt(n + 1);
+    // 2.只要队列不为空则一直跑
+    while (q.size())
+    {
+        // 取出队头作为松弛的起点
+        int x = q.front();
+        q.pop();
+        inq[x] = 0;
+        // 枚举所有出点
+        for (auto [y, w] : g[x])
+        {
+            // 判断是否能够松弛
+            if (d[y] > d[x] + w)
+            {
+                  // 判断是否有负环
+                if(++cnt[y] > n)return 1;
+                d[y] = d[x] + w;
+                if (!inq[y])
+                {
+                    q.push(y);
+                    inq[y] = 1;
+                }
+            }
+        }
+    }
+    // 没有负环
+    return 0;
+}
+void solve()
+{
+    cin >> n >> m;
+    for (int i = 1; i <= m; i++)
+    {
+        ll u, v, w;
+        cin >> u >> v >> w;
+        g[u].pb({v, w});
+    }
+    // 1.初始化
+    for (int i = 2; i <= n; i++)
+        d[i] = INF;
+    // 2.进行n轮松弛，判断第n轮是否进行了松弛操作
+    if (spfa(1))
+        cout << "-1\n";
+    else
+    {
+        for (int i = 1; i <= n; i++)
+            cout << d[i] << " ";
+        cout << '\n';
+    }
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+3. Bezouts.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64=long long;
+using u64=unsigned long long;
+//ax+by=gcd(a,b)一定有解并且ax+by=k*gcd(a,b)一定有解，其余情况一定无解
+void work()
+{
+    
+}
+int main() {
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t=1;
+cin >> t;
+while(t--)
+work();
+}
+
+4. BGC(Dinic).cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+constexpr int inf = 1E9;
+template <class T>
+struct MaxFlow
+{
+    struct _Edge
+    {
+        int to;
+        T cap;
+        _Edge(int to, T cap) : to(to), cap(cap) {}
+    };
+
+    int n;
+    std::vector<_Edge> e;
+    std::vector<std::vector<int>> g;
+    std::vector<int> cur, h;
+
+    MaxFlow() {}
+    MaxFlow(int n)
+    {
+        init(n);
+    }
+
+    void init(int n)
+    {
+        this->n = n;
+        e.clear();
+        g.assign(n, {});
+        cur.resize(n);
+        h.resize(n);
+    }
+
+    bool bfs(int s, int t)
+    {
+        h.assign(n, -1);
+        std::queue<int> que;
+        h[s] = 0;
+        que.push(s);
+        while (!que.empty())
+        {
+            const int u = que.front();
+            que.pop();
+            for (int i : g[u])
+            {
+                auto [v, c] = e[i];
+                if (c > 0 && h[v] == -1)
+                {
+                    h[v] = h[u] + 1;
+                    if (v == t)
+                    {
+                        return true;
+                    }
+                    que.push(v);
+                }
+            }
+        }
+        return false;
+    }
+
+    T dfs(int u, int t, T f)
+    {
+        if (u == t)
+        {
+            return f;
+        }
+        auto r = f;
+        for (int &i = cur[u]; i < int(g[u].size()); ++i)
+        {
+            const int j = g[u][i];
+            auto [v, c] = e[j];
+            if (c > 0 && h[v] == h[u] + 1)
+            {
+                auto a = dfs(v, t, std::min(r, c));
+                e[j].cap -= a;
+                e[j ^ 1].cap += a;
+                r -= a;
+                if (r == 0)
+                {
+                    return f;
+                }
+            }
+        }
+        return f - r;
+    }
+    void addEdge(int u, int v, T c)
+    {
+        g[u].push_back(e.size());
+        e.emplace_back(v, c);
+        g[v].push_back(e.size());
+        e.emplace_back(u, 0);
+    }
+    T flow(int s, int t)
+    {
+        T ans = 0;
+        while (bfs(s, t))
+        {
+            cur.assign(n, 0);
+            ans += dfs(s, t, std::numeric_limits<T>::max());
+        }
+        return ans;
+    }
+
+    std::vector<bool> minCut()
+    {
+        std::vector<bool> c(n);
+        for (int i = 0; i < n; i++)
+        {
+            c[i] = (h[i] != -1);
+        }
+        return c;
+    }
+
+    struct Edge
+    {
+        int from;
+        int to;
+        T cap;
+        T flow;
+    };
+    std::vector<Edge> edges()
+    {
+        std::vector<Edge> a;
+        for (int i = 0; i < e.size(); i += 2)
+        {
+            Edge x;
+            x.from = e[i + 1].to;
+            x.to = e[i].to;
+            x.cap = e[i].cap + e[i + 1].cap;
+            x.flow = e[i + 1].cap;
+            a.push_back(x);
+        }
+        return a;
+    }
+};
+void work()
+{
+    int L,R,m;
+    cin>>L>>R>>m;
+    MaxFlow<i64> mf(L+R + 2);
+    int s=0,t=L+R+1;
+    for(int i=1;i<=L;++i)
+    mf.addEdge(s,i,1);
+    for(int i=1;i<=R;++i)
+    mf.addEdge(L+i,t,1);
+    for (int i = 0; i < m; ++i)
+    {
+        int u, v;
+        cin >> u >> v;
+        mf.addEdge(u+1,L+v+1,1);
+    }
+    cout<<mf.flow(s,t)<<'\n';
+    vector<pair<int,int>> ans;
+    for(const auto&i:mf.edges())
+    {
+        if(i.from>=1&&i.from<=L&&i.to>=L+1&&i.to<=L+R&&i.flow==1)
+        ans.push_back({i.from-1,i.to-L-1});
+    }
+    sort(ans.begin(), ans.end());
+    for(const auto&[x,y]:ans)cout<<x<<' '<<y<<'\n';
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+5. BGC(KM).cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+// check二分图
+int col[N];
+vector<int> g[N];
+bool dfs(int x)
+{
+    for (const auto &y : g[x])
+    {
+        if (col[y] == -1)
+        {
+            col[y] = col[x] ^ 1;
+            if (!dfs(y))
+                return 0;
+        }
+        else if (col[y] == col[x])
+            return 0;
+    }
+    return 1;
+}
+void solve()
+{
+    int n, m;
+    cin >> n >> m;
+    for (int i = 1; i <= m; ++i)
+    {
+        int x, y;
+        cin >> x >> y;
+        g[x].pb(y);
+        g[y].pb(x);
+    }
+    for (int i = 1; i <= n; ++i)
+        col[i] = -1;
+    bool ans = 1;
+    for (int i = 1; i <= n; ++i)
+    {
+        if (col[i] == -1)
+        {
+            col[i] = 0;
+            ans &= dfs(i);
+        }
+    }
+    cout << (ans ? "YES" : "NO") << '\n';
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+6. bin_ser.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+
+using i64 = long long;
+const int N=2e5+10;
+int a[N];
+void work()
+{
+    int n,q;
+	std::cin>>n>>q;
+	for(int i=1;i<=n;i++)std::cin>>a[i];
+	while(q--)
+	{
+		int x;std::cin>>x;
+		int l=0,r=n+1;
+		while(l+1!=r)
+		{
+			int mid=(l+r)>>1;
+			if(a[mid]<x)l=mid;
+			else r=mid;
+		}
+		if(a[r]==x)std::cout<<r<<' ';
+		else std::cout<<-1<<' ';
+	}
+}
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int _=1;
+    //std::cin>>_;
+    while(_--)work();
+    return 0;
+}
+
+7. BinIdxTree.cpp
+------------------
+/*blank*/
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long int ll;
+typedef unsigned long long int ull;
+#define sc scanf
+#define pr printf
+const int mx=2e5+5;
+ll n,q,a[mx],td[mx],ti_1d[mx];
+ll lowbit(ll x) {return x&(-x);}
+void update(int k,ll x)
+{
+   for(int i=k;i<=n;i+=lowbit(i))
+   {
+       td[i]+=x,ti_1d[i]+=x*k;
+   }
+}
+ll getsum(int k)
+{
+   ll sum=0;
+   for(int i=k;i>0;i-=lowbit(i))
+   {sum+=(k+1)*td[i]-ti_1d[i];}
+   return sum;
+}
+void work()
+{
+   cin>>n>>q;
+   for(int i=1;i<=n;++i)cin>>a[i];
+   for(int i=1;i<=n;++i)
+   {
+       update(i,a[i]),update(i+1,-a[i]);
+   }
+   int op;
+   while(q--)
+   {
+       cin>>op;
+       if(op==1)
+       {
+           ll l,r,v;
+           cin>>l>>r>>v;
+           update(l,v),update(r+1,-v);
+       }
+       else
+       {
+           ll l,r;
+           cin>>l>>r;
+           cout<<getsum(r)-getsum(l-1)<<'\n';
+       }
+   }
+}
+int main()
+{
+ios::sync_with_stdio(0);
+cin.tie(0);
+cout.tie(0);
+int _=1;
+//cin >> _;
+//sc("%d",&_);
+while (_--)work();
+return 0;
+}
+
+8. BST.cpp
+------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define endl '\n'
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+
+const int N = 1e5 + 10;
+
+struct node {
+    int v;        // 值
+    int fa;       // 父节点编号
+    int lc, rc;   // 左右子节点编号
+    int dep;      // 深度
+} t[N];
+int root = 0, idx = 0;
+map<int, int> mp; // 值 -> 节点编号映射
+// 插入操作
+void ins(int &u, int v, int fa, int dep) {
+    if (!u) {
+        u = ++idx;
+        t[u] = {v, fa, 0, 0, dep};
+        mp[v] = u;
+        return;
+    }
+    if (v < t[u].v) ins(t[u].lc, v, u, dep + 1);
+    else ins(t[u].rc, v, u, dep + 1);
+}
+
+// 查找值对应的节点编号
+int find(int u, int v) {
+    if (!u) return 0;
+    if (t[u].v == v) return u;
+    if (v < t[u].v) return find(t[u].lc, v);
+    return find(t[u].rc, v);
+}
+
+// 获取兄弟节点的值
+int getxd(int u) {
+    int f = t[u].fa;
+    if (!f) return 0;
+    if (t[f].lc == u && t[f].rc) return t[t[f].rc].v;
+    if (t[f].rc == u && t[f].lc) return t[t[f].lc].v;
+    return 0;
+}
+
+// 中序遍历
+void inorder(int u) {
+    if (!u) return;
+    inorder(t[u].lc);
+    cout << t[u].v << ' ';
+    inorder(t[u].rc);
+}
+
+// 前序遍历
+void preorder(int u) {
+    if (!u) return;
+    cout << t[u].v << ' ';
+    preorder(t[u].lc);
+    preorder(t[u].rc);
+}
+
+// 后序遍历
+void postorder(int u) {
+    if (!u) return;
+    postorder(t[u].lc);
+    postorder(t[u].rc);
+    cout << t[u].v << ' ';
+}
+
+// 找最小值（子树最左）
+int findmin(int u) {
+    while (t[u].lc) u = t[u].lc;
+    return u;
+}
+
+// 找最大值（子树最右）
+int findmax(int u) {
+    while (t[u].rc) u = t[u].rc;
+    return u;
+}
+
+// 删除操作
+int rmv(int u, int v) {
+    if (!u) return 0;
+    if (v < t[u].v) t[u].lc = rmv(t[u].lc, v);
+    else if (v > t[u].v) t[u].rc = rmv(t[u].rc, v);
+    else {
+        if (!t[u].lc) return t[u].rc;
+        if (!t[u].rc) return t[u].lc;
+        int successor = findmin(t[u].rc);
+        t[u].v = t[successor].v;
+        t[u].rc = rmv(t[u].rc, t[successor].v);
+    }
+    return u;
+}
+// 找前驱（小于v的最大值）
+int predecessor(int u, int v) {
+    int pre = 0;
+    while (u) {
+        if (t[u].v < v) {
+            pre = u;
+            u = t[u].rc;
+        } else u = t[u].lc;
+    }
+    return pre;
+}
+
+// 找后继（大于v的最小值）
+int successor(int u, int v) {
+    int suc = 0;
+    while (u) {
+        if (t[u].v > v) {
+            suc = u;
+            u = t[u].lc;
+        } else u = t[u].rc;
+    }
+    return suc;
+}
+
+void solve() {
+    int n;
+    cin >> n;
+    int a[n];
+    for (int &x : a) cin >> x;
+
+    // 建树
+    for (int x : a) ins(root, x, 0, 1);
+
+    // 树遍历演示
+    cout << "中序: "; inorder(root); cout << endl;
+    cout << "前序: "; preorder(root); cout << endl;
+    cout << "后序: "; postorder(root); cout << endl;
+
+    // 查询样例
+    cout << "删除 3\n";
+    root = rmv(root, 3);
+    cout << "中序: "; inorder(root); cout << endl;
+
+    cout << "前驱 后继示例:\n";
+    for (int x : a) {
+        int pre = predecessor(root, x);
+        int suc = successor(root, x);
+        cout << x << " 前驱: " << (pre ? t[pre].v : -1) << " 后继: " << (suc ? t[suc].v : -1) << endl;
+    }
+}
+
+int main() {
+    io;
+    solve();
+    return 0;
+}
+
+9. Discrt.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+
+using i64 = long long;
+const int mx=5e5+10;
+std::vector<int>X;
+i64 a[mx];
+struct node
+{
+    i64 a,b;
+}add[mx],que[mx];
+int getidx(int x)
+{
+    return std::lower_bound(X.begin(),X.end(),x)-X.begin()+1;
+}
+void work()
+{
+    int n,q;
+    std::cin>>n>>q;
+    for(int i=1;i<=n;++i)
+    {
+        int x,w;
+        std::cin>>x>>w;
+        X.push_back(x);
+        add[i]={x,w};
+    }
+    for(int i=1;i<=q;++i)
+    {
+        i64 l,r;
+        std::cin>>l>>r;
+        X.push_back(l),X.push_back(r);
+        que[i]={l,r};
+    }
+    sort(begin(X),end(X));
+    X.erase(unique(begin(X),end(X)),end(X));
+      for(int i=1;i<=n;++i)
+    {
+        int x=getidx(add[i].a);
+        i64 w=add[i].b;
+        a[x]+=w;
+    }
+    for(int i=1;i<=X.size();++i)a[i]+=a[i-1];
+    for(int i=1;i<=q;++i)
+    {
+        int l=getidx(que[i].a);
+        int r=getidx(que[i].b);
+        std::cout<<a[r]-a[l-1]<<'\n';
+    }
+    
+}
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int _=1;
+    //std::cin>>_;
+    while(_--)work();
+    return 0;
+}
+
+10. DP(01K).cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 1e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+int n, m;
+ll t, T[N], W[N], dp[N];
+void solve()
+{
+    cin >> n >> m >> t;
+    for (int i = 1; i <= n; ++i)
+        cin >> T[i] >> W[i];
+    for (int i = 1; i <= m; ++i)
+    {
+        for (int j = t; j >= T[i]; --j)
+        {
+            if (j >= T[i])
+                dp[j] = max(dp[j - T[i]] + W[i], dp[j]);
+            else
+                dp[j] = dp[j];
+        }
+    }
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+11. DP(BK).cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 1e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+ll n, s, w, v, m;
+ll dp[N];
+void solve()
+{
+    for (int i = 1; i <= n; ++i)
+    {
+        cin >> s >> w >> v;
+        vector<int> vec;
+        int x = 1;
+        while (s >= x)
+        {
+            vec.push_back(x);
+            s -= x;
+            x <<= 1;
+        }
+        if (s)
+            vec.push_back(s);
+        for (int k : vec)
+        {
+            for (int j = m; j >= k * v; --j)
+                dp[j] = max(dp[j], dp[j - k * v] + k * w);
+        }
+    }
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+12. DP(Tree).cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+//树上dp+启发式合并的完美体现
+int sz[N], son[N], cnt[N], c[N];
+int ans;
+vector<int> g[N];
+multiset<int> st;
+void AddNode(int x)
+{
+    if (cnt[c[x]])
+        st.erase(st.find(cnt[c[x]]));
+    if (++cnt[c[x]] != 0)
+        st.insert(cnt[c[x]]);
+}
+void DelNode(int x)
+{
+    st.erase(st.find(cnt[c[x]]));
+    if (--cnt[c[x]] != 0)
+        st.insert(cnt[c[x]]);
+}
+void AddTree(int x)
+{
+    AddNode(x);
+    for (const auto &y : g[x])
+        AddTree(y);
+}
+void DelTree(int x)
+{
+    DelNode(x);
+    for (const auto &y : g[x])
+        DelTree(y);
+}
+void dfs1(int x)
+{
+    sz[x] = 1;
+    for (const auto &y : g[x])
+    {
+        dfs1(y);
+        sz[x] += sz[y];
+        if (sz[y] > sz[son[x]])
+            son[x] = y;
+    }
+}
+void dfs(int x)
+{
+    for (const auto &y : g[x])
+    {
+        if (y == son[x])
+            continue;
+        dfs(y);
+        DelTree(y);
+    }
+    if (son[x])
+        dfs(son[x]);
+    for (const auto &y : g[x])
+    {
+        if (y == son[x])
+            continue;
+        AddTree(y);
+    }
+    AddNode(x);
+    if (SZ(st) && *st.begin() == *st.rbegin())
+        ans++;
+}
+void solve()
+{
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; ++i)
+    {
+        int fa;
+        cin >> c[i] >> fa;
+        g[fa].pb(i);
+    }
+    dfs1(1);
+    dfs(1);
+    cout << ans << '\n';
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+13. DP(UK).cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 1e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+int n, m;
+ll w[N], v[N], dp[N];
+void solve()
+{
+    cin >> n >> m;
+    for (int i = 1; i <= n; ++i)
+    {
+        cin >> v[i] >> w[i];
+    }
+    for (int i = 1; i <= n; ++i)
+    {
+        for (int j = v[i]; j <= m; ++j)
+        {
+            dp[j] = max(dp[j], dp[j - v[i]] + w[i]);
+        }
+    }
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+14. DSU.cpp
+------------------
+/*blank*/
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long//一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+const int mx=2e5+1;
+ll pre[mx];
+int root(int v)
+{
+    return pre[v]=(pre[v]==v?v:root(pre[v]));
+}
+void merge(int a,int b)
+{
+    pre[root(a)]=root(b);
+}
+bool same(int a,int b)
+{   
+    return root(a)==root(b);
+}
+void work()
+{
+    
+}
+int main()
+{
+ios::sync_with_stdio(0);
+cin.tie(0);
+cout.tie(0);
+int _=1;
+//cin >> _;
+//sc("%d",&_);
+while (_--)work();
+return 0;
+}
+
+15. DSU(HM).cpp
+------------------
+/*🫵😉👍*/
+#include<bits/stdc++.h>
+#include<iostream>
+#include<iomanip>
+#include<cstdio>
+#include<cstring>
+#include<vector>
+#include<map>
+#include<stack>
+#include<math.h>
+#include<stdlib.h>
+#include<queue>
+#include<set>
+#include<string.h>
+#include<string>
+#include<stdio.h>
+#include<deque>
+#include<numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define se second
+#define all(v) v.begin(),v.end()
+#define pb push_back
+#define lowbit(x) (x&-x)
+#define fixed(x) fixed<<setprecision(x)
+#define lcm(x,y) x*y/__gcd(x,y)
+#define endl "\n"
+#define io ios::sync_with_stdio(false),cin.tie(0),cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6+10, base = 13331, mod = 1e9 + 7;
+const ull INF=1e18;
+const double pie=acos(-1),eps=1e-8;
+int dir[]={0,1,0,-1,0};
+const int dx[]={1,1,1,0,0,-1,-1,-1};
+const int dy[]={1,0,-1,-1,0,1,-1};
+typedef pair<ll, ll>PAIR;
+//启发式并查集
+int pre[N],sz[N],a[N];
+int find(int x)
+{
+    return pre[x] = (pre[x]==x ? x : find(pre[x]));
+}
+void merge(int x,int y)
+{
+    int fx=find(x),fy=find(y);
+    if(fx==fy)return;
+    if(sz[fx]>sz[fy])swap(fx,fy);
+    pre[fx]=fy;
+    sz[fy]+=sz[fx];
+}
+void solve(){
+    int n;
+    cin>>n;
+    for(int i=1;i<=n;++i)cin>>a[i];
+    for(int i=1;i<=n;++i)pre[i]=i,sz[i]=1;
+    int m;cin>>m;
+    while(m--)
+    {
+        int x, y;cin>>x>>y;
+        merge(x,y);
+    }
+    int ans=0;
+    for(int i=1;i<=n;++i)if(pre[i]!=i)a[find(i)]^=a[i];
+    for(int i=1;i<=n;++i)if(pre[i]==i)ans=max(ans,a[i]);
+    cout<<ans<<'\n';
+}
+//联通块大小
+/*void solve(){
+    int n,m;
+    cin>>n>>m;
+    for(int i=1;i<=n;++i)pre[i]=i,sz[i]=1;
+    while(m--)
+    {
+        int x, y;cin>>x>>y;
+        merge(x,y);
+    }
+    vector<int>vc;
+    for(int i=1;i<=n;++i)if(pre[i]==i)vc.pb(sz[i]);
+    sort(all(vc));
+    for(const auto &i:vc)cout<<i<<' ';
+}*/
+signed main(){
+    io;
+    ll _ = 1;
+    //cin >> _;
+    while(_ -- ) solve();
+    return 0;
+}
+
+16. DSU(RB).cpp
+------------------
+/*🫵😉👍*/
+#include<bits/stdc++.h>
+#include<iostream>
+#include<iomanip>
+#include<cstdio>
+#include<cstring>
+#include<vector>
+#include<map>
+#include<stack>
+#include<math.h>
+#include<stdlib.h>
+#include<queue>
+#include<set>
+#include<string.h>
+#include<string>
+#include<stdio.h>
+#include<deque>
+#include<numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define se second
+#define all(v) v.begin(),v.end()
+#define pb push_back
+#define lowbit(x) (x&-x)
+#define fixed(x) fixed<<setprecision(x)
+#define lcm(x,y) x*y/__gcd(x,y)
+#define endl "\n"
+#define io ios::sync_with_stdio(false),cin.tie(0),cout.tie(0)
+const ll N = 1e5 + 100, M = 1e6+10, base = 13331, mod = 1e9 + 7;
+const ull INF=1e18;
+const double pie=acos(-1),eps=1e-8;
+int dir[]={0,1,0,-1,0};
+const int dx[]={1,1,1,0,0,-1,-1,-1};
+const int dy[]={1,0,-1,-1,0,1,-1};
+typedef pair<ll, ll>PAIR;
+//可撤销并查集
+int pre[N],sz[N],top;
+PAIR stk[N];
+int find(int x)
+{
+    return pre[x]==x?x:find(pre[x]);
+}
+void merge(int x,int y)
+{
+    int fx=find(x),fy=find(y);
+    if(fx==fy)return;
+    if(sz[fx]>sz[fy])swap(fx,fy);
+    stk[++top]={fx,fy};
+    pre[fx]=fy,sz[fy]+=sz[fx];
+}
+void undo()
+{
+    if(!top)return;
+    auto [x,y]=stk[top--];
+    sz[y]-=sz[x];
+    pre[x]=x;
+}
+void solve(){
+    int n,q;cin>>n>>q;
+    for(int i=1;i<=n;++i)pre[i]=i,sz[i]=1;
+    while (q--)
+    {
+        int op;cin>>op;
+        if(op==1)
+        {
+            int x,y;cin>>x>>y;
+            merge(x,y);
+        }
+        else if(op==2)undo();
+        else
+        {
+            int x,y;cin>>x>>y;
+            cout<<(find(x)==find(y)?"YES\n":"NO\n");
+        }
+    }
+    
+}
+signed main(){
+    io;
+    ll _ = 1;
+    //cin >> _;
+    while(_ -- ) solve();
+    return 0;
+}
+
+17. DSU(Weight).cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>  
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+//带权并查集
+int pre[N], d[N], sz[N]; // d[i]表示节点i到fq的距离
+int mo(int x)
+{
+    return (x % 2 + 2) % 2;
+}
+int find(int x) { return pre[x] == x ? x : find(pre[x]); }
+int getd(int x)
+{
+    int res = 0;
+    while (pre[x] != x)
+    {
+        res += d[x];
+        x = pre[x];
+    }
+    return res;
+}
+void merge(int x, int y)
+{
+    int fx = find(x), fy = find(y);
+    if (fx == fy)
+        return;
+    if (sz[fx] > sz[fy])
+        swap(fx, fy);
+    pre[fx] = fy, sz[fy] += sz[fx], d[fx] = mo(1 - getd(x) + getd(y));
+}
+
+void solve()
+{
+    int n, m;
+    cin >> n >> m;
+    for (int i = 1; i <= n; ++i)
+        pre[i] = i, sz[i] = 1, d[i] = 0;
+    while (m--)
+    {
+        int op, x, y;
+        cin >> op >> x >> y;
+        if (op == 1)
+            merge(x, y);
+        else
+        {
+            int rx = find(x), ry = find(y);
+            if (rx != ry)
+                cout << "Unknown\n";
+            else if (mo(getd(x) - getd(y)) == 1)
+                cout << "NO\n";
+            else
+                cout << "YES\n";
+        }
+    }
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+18. Exgcd.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64=long long;
+using u64=unsigned long long;
+i64 mo(i64 x,i64 p){return (x%p+p)%p;}
+i64 exgcd(i64 a,i64 b,i64&x,i64&y)
+{
+    if(!b)return x=1,y=0,a;
+    i64 d = exgcd(b,a%b,y,x);
+    y-=a/b*x;
+    return d;
+}
+void work()
+{
+    i64 a,b,c;cin>>a>>b>>c;
+    i64 x,y,d=exgcd(a<0?-a:a,b<0?-b:b,x,y);
+    if(c%d)return void(cout<<"-1\n");
+    if(a<0)x=-x;
+    x=mo(x*(c/d),b/d);
+    cout<<x<<'\n';
+}
+int main() {
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t=1;
+// cin >> t;
+while(t--)
+work();
+}
+
+19. FHQ.cpp
+------------------
+/*blank*/
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long//一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+const int mx=2e5+1;
+const int inf=1e9;
+mt19937 sj(1919810);//随机数
+struct node{
+    int l,r;
+    int sz,v,key;
+}fhq[mx];
+int idx,root,T1,T2,T3;
+int build(int v)//建树
+{
+    fhq[++idx]={0,0,1,v,(int)sj()};
+    return idx;
+}
+void pushup(int v)//更新节点
+{
+    fhq[v].sz=fhq[fhq[v].l].sz+fhq[fhq[v].r].sz+1;
+}
+void split(int u,int v,int&x,int&y)//从u节点分解成两棵树(两个区间)
+{
+    if(!u)
+    {
+        x=y=0;
+        return ;
+    }
+    if(fhq[u].v>v)
+    {
+        y=u;
+        split(fhq[u].l,v,x,fhq[u].l);
+    }
+    else
+    {
+        x=u;
+        split(fhq[u].r,v,fhq[u].r,y);
+    }
+    pushup(u);
+}
+int merge(int x,int y)//合并区间
+{
+    if(!x||!y) return x+y;
+    if(fhq[x].key<fhq[y].key)
+    {
+        fhq[x].r=merge(fhq[x].r,y);
+        pushup(x);
+        return x;
+    }
+    else
+    {
+        fhq[y].l=merge(x,fhq[y].l);
+        pushup(y);
+        return y;
+    }
+}
+void ins(int v)//插入节点
+{
+    split(root,v,T1,T2);
+    root=merge(merge(T1,build(v)),T2);
+}
+void del(int v)//删除节点
+{
+    split(root, v, T1, T2);
+    split(T1, v-1, T1, T3);
+    if (T3) T3 = merge(fhq[T3].l, fhq[T3].r);
+    root = merge(merge(T1, T3), T2);
+}
+int gr(int v)//获取值为v的节点排名
+{
+    split(root, v - 1, T1, T2);
+    int res = fhq[T1].sz;
+    root = merge(T1, T2);
+    return res + 1;
+}
+int kth(int k)//获取第k大的节点值
+{
+    int u = root;
+    while (u)
+    {
+        int tmp = fhq[fhq[u].l].sz + 1;
+        if (tmp == k)
+            break;
+        else if (tmp <= k)
+        {
+            k -= tmp;
+            u = fhq[u].r;
+        }
+        else
+        {
+            u = fhq[u].l;
+        }
+    }
+    return fhq[u].v;
+}
+int gpre(int v)//获取节点v的上一个节点
+{
+    split(root, v - 1, T1, T2);
+    int u = T1;
+    if (!u) {
+        root = merge(T1, T2);
+        return -inf;
+    }
+    while (fhq[u].r)
+        u = fhq[u].r;
+    root = merge(T1, T2);
+    return fhq[u].v;
+}
+int gnext(int v)//获取节点v的下一个节点
+{
+    split(root, v, T1, T2);
+    int u = T2;
+    if (!u) {
+        root = merge(T1, T2);
+        return inf;
+    }
+    while (fhq[u].l)
+        u = fhq[u].l;
+    root = merge(T1, T2);
+    return fhq[u].v;
+}
+int getmx()//获取最大值
+{
+    int u = root;
+    while (fhq[u].r)
+        u = fhq[u].r;
+    return fhq[u].v;
+}
+int getmn()//获取最小值
+{
+    int u = root;
+    while (fhq[u].l)
+        u = fhq[u].l;
+    return fhq[u].v;
+}
+bool vis(int v) {//判断某个节点是否存在
+    split(root, v, T1, T2);
+    split(T1, v - 1, T1, T3);
+    bool exist = (T3 != 0);
+    root = merge(merge(T1, T3), T2);
+    return exist;
+}
+void work()
+{
+    
+}
+int main()
+{
+ios::sync_with_stdio(0);
+cin.tie(0);
+cout.tie(0);
+int _=1;
+//cin >> _;
+//sc("%d",&_);
+while (_--)work();
+return 0;
+}
+
+20. FHQQJFZ.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+const int mx = 2e5 + 5;
+mt19937 sj(1919810);
+struct node
+{
+    int l, r;
+    int v, key;
+    int sz;
+    bool rev;
+} fhq[mx];
+int cnt, root;
+int build(int v) // 建树
+{
+    fhq[++cnt].v = v;
+    fhq[cnt].key = sj();
+    fhq[cnt].sz = 1;
+    return cnt;
+}
+void pushup(int u) // 更新节点
+{
+    fhq[u].sz = (fhq[u].l ? fhq[fhq[u].l].sz : 0) + (fhq[u].r ? fhq[fhq[u].r].sz : 0) + 1;
+}
+void pushdown(int u) // 更新标记
+{
+    if (fhq[u].rev)
+    {
+        swap(fhq[u].l, fhq[u].r);
+        if (fhq[u].l)
+            fhq[fhq[u].l].rev ^= 1;
+        if (fhq[u].r)
+            fhq[fhq[u].r].rev ^= 1;
+        fhq[u].rev = 0;
+    }
+}
+void split(int u, int siz, int &x, int &y) // 从u节点分裂成两棵树(两个区间)
+{
+    if (!u)
+        x = y = 0;
+    else
+    {
+        if (fhq[u].rev)
+            pushdown(u);
+        int lsz = fhq[u].l ? fhq[fhq[u].l].sz : 0;
+        if (lsz < siz)
+        {
+            x = u;
+            split(fhq[u].r, siz - lsz - 1, fhq[u].r, y);
+        }
+        else
+        {
+            y = u;
+            split(fhq[u].l, siz, x, fhq[u].l);
+        }
+        pushup(u);
+    }
+}
+int merge(int x, int y) // 合并x,y节点的树(区间合并)
+{
+    if (!x || !y)
+        return x + y;
+    if (fhq[x].key < fhq[y].key)
+    {
+        if (fhq[x].rev)
+            pushdown(x);
+        fhq[x].r = merge(fhq[x].r, y);
+        pushup(x);
+        return x;
+    }
+    else
+    {
+        if (fhq[y].rev)
+            pushdown(y);
+        fhq[y].l = merge(x, fhq[y].l);
+        pushup(y);
+        return y;
+    }
+}
+void rev(int l, int r) // 区间反转
+{
+    int x, y, z;
+    split(root, l - 1, x, y);
+    split(y, r - l + 1, y, z);
+    fhq[y].rev ^= 1;
+    root = merge(merge(x, y), z);
+}
+void work()
+{
+    int n, m;
+    cin >> n >> m;
+    root = 0;
+    cnt = 0;
+    for (int i = 1; i <= n; i++)
+        root = merge(root, build(i));
+    while (m--)
+    {
+        int l, r;
+        cin >> l >> r;
+        rev(l, r);
+    }
+    vector<int> res;
+    auto dfs = [&](auto self,int u)->void
+    {
+        if (!u)
+            return;
+        if (fhq[u].rev)
+            pushdown(u);
+        self(self,fhq[u].l);
+        res.push_back(fhq[u].v);
+        self(self,fhq[u].r);
+    };
+    dfs(dfs,root);
+    for (int i = 0; i < n; i++)
+        cout << res[i] << " \n"[i == n - 1];
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+21. Floyd.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+const int mx = 301;
+const ll inf = 4e18;
+ll dp[mx][mx];
+void work()
+{
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; ++i)
+    {
+        fill(dp[i] + 1, dp[i] + n + 1, inf);
+        dp[i][i] = 0;
+    }
+    for (int k = 1; k <= n; ++k)
+        for (int i = 1; i <= n; ++i)
+            for (int j = 1; j <= n; ++j)
+                dp[i][j] = min(dp[i][j], dp[i][k] + dp[k][j]);
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+22. gaojindu(add).cpp
+------------------
+/*blank*/
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long//一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+string add(string a,string b)
+{
+    bool f;
+    string ans;
+    if(a.size()<b.size())swap(a,b);
+    while(a.size()<b.size())a='0'+a;
+    while(b.size()<a.size())b='0'+b;
+    for(int i=a.size()-1;i>=0;--i)
+    {
+        int t=a[i]-'0'+b[i]-'0'+f;
+        f=t/10;
+        ans=char(t%10+'0')+ans;
+    }
+    if(f)ans='1'+ans;
+    return ans;
+}
+void work()
+{
+    cout<<add("1234","5678");
+}
+int main()
+{
+ios::sync_with_stdio(0);
+cin.tie(0);
+cout.tie(0);
+int _=1;
+//cin >> _;
+//sc("%d",&_);
+while (_--)work();
+return 0;
+}
+
+23. gaojindu(sup).cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+#define MAXN 9999     // 数组中的单个元素最多存储DLEN位
+#define MAXSIZE 10000 // 大数的长度为MAXSIZE*MAXN
+#define DLEN 4        // 数组中的单个元素最多存储DLEN位
+
+class BigNum
+{
+private:
+    bool flag;      // 判断大数是否有负号，有负号为true
+    int a[MAXSIZE]; // 可以控制大数的位数
+    int len;        // 大数长度,注意这里单位长度是四
+public:
+    BigNum()
+    {
+        len = 1;
+        memset(a, 0, sizeof(a));
+        flag = true;
+    }                                  // 构造函数
+    BigNum(const int);                 // 将一个int类型的变量转化为大数
+    BigNum(const char *);              // 将一个字符串类型的变量转化为大数
+    BigNum(const string);              // 将一个字符串类型的变量转化为大数
+    BigNum(const BigNum &);            // 拷贝构造函数
+    BigNum &operator=(const BigNum &); // 重载赋值运算符，大数之间进行赋值运算
+
+    friend istream &operator>>(istream &, BigNum &); // 重载输入运算符
+    friend ostream &operator<<(ostream &, BigNum &); // 重载输出运算符
+
+    BigNum operator+(const BigNum &) const; // 重载加法运算符，两个大数之间的相加运算
+    BigNum operator-(const BigNum &) const; // 重载减法运算符，两个大数之间的相减运算
+    BigNum operator*(const BigNum &) const; // 重载乘法运算符，两个大数之间的相乘运算
+    BigNum operator/(const int &) const;    // 重载除法运算符，大数对一个整数进行相除运算
+
+    BigNum operator^(const int &) const; // 大数的n次方运算
+    int operator%(const int &) const;    // 大数对一个int类型的变量进行取模运算
+    friend int cmp(BigNum a, BigNum b);
+    bool operator>(const BigNum &T) const;  // 大数和另一个大数的大小比较
+    bool operator>=(const BigNum &T) const; // 大数和另一个大数的大小比较
+    bool operator<(const BigNum &T) const;  // 大数和另一个大数的大小比较
+    bool operator<=(const BigNum &T) const; // 大数和另一个大数的大小比较
+    bool operator==(const BigNum &T) const; // 大数和另一个大数的大小比较
+
+    void print();  // 输出大数
+    void getter(); // test
+};
+BigNum::BigNum(const int b) // 将一个int类型的变量转化为大数
+{
+    int c, d = b;
+    len = 0;
+    memset(a, 0, sizeof(a));
+    if (d < 0)
+    {
+        flag = true;
+        d = -d;
+    }
+    else
+        flag = false;
+    while (d > MAXN)
+    {
+        c = d - (d / (MAXN + 1)) * (MAXN + 1);
+        d = d / (MAXN + 1);
+        a[len++] = c;
+    }
+    a[len++] = d;
+}
+BigNum::BigNum(const char *s) // 将一个字符串类型的变量转化为大数
+{
+    int t, k, index, l;
+    memset(a, 0, sizeof(a));
+    if (s[0] == '-')
+    {
+        flag = true;
+    }
+    else
+        flag = false;
+    l = strlen(s);
+    len = (l - flag) / DLEN;
+    if ((l - flag) % DLEN)
+    {
+        len++;
+    }
+    index = 0;
+    for (int i = l - 1; i >= 0; i -= DLEN)
+    {
+        t = 0;
+        k = i - DLEN + 1;
+        if (k <= 0)
+            k = (i <= DLEN && flag ? 1 : 0);
+        for (int j = k; j <= i; j++)
+            t = t * 10 + s[j] - '0';
+        a[index++] = t;
+    }
+}
+BigNum::BigNum(const string s)
+{ // 将一个字符串类型的变量转化为大数
+    int t, k, index, l;
+    memset(a, 0, sizeof(a));
+    if (s[0] == '-')
+    {
+        flag = true;
+    }
+    else
+        flag = false;
+    l = s.size();
+    len = (l - flag) / DLEN;
+    if ((l - flag) % DLEN)
+        len++;
+    index = 0;
+    for (int i = l - 1; i >= 0; i -= DLEN)
+    {
+        t = 0;
+        k = i - DLEN + 1;
+        if (k <= 0)
+        {
+            k = (i <= DLEN && flag ? 1 : 0);
+        }
+        for (int j = k; j <= i; j++)
+        {
+            t = t * 10 + s[j] - '0';
+        }
+        a[index++] = t;
+    }
+}
+BigNum::BigNum(const BigNum &T) : len(T.len), flag(T.flag)
+{ // 拷贝构造函数
+    int i;
+    memset(a, 0, sizeof(a));
+    for (i = 0; i < len; i++)
+        a[i] = T.a[i];
+}
+BigNum &BigNum::operator=(const BigNum &T)
+{ // 重载赋值运算符，大数之间进行赋值运算
+    int i;
+    len = T.len;
+    flag = T.flag;
+    memset(a, 0, sizeof(a));
+    for (i = 0; i < len; i++)
+        a[i] = T.a[i];
+    return *this;
+}
+istream &operator>>(istream &in, BigNum &T)
+{ // 重载输入运算
+    char ch[MAXSIZE * DLEN];
+    int index, t, k;
+    in >> ch;
+    if (ch[0] == '-')
+    {
+        T.flag = true;
+    }
+    else
+        T.flag = false;
+    int l = strlen(ch);
+    T.len = (l - T.flag) / DLEN;
+    if ((l - T.flag) % DLEN) // 是DLEN的倍数
+        T.len++;
+    index = 0;
+    for (int i = l - 1; i >= 0; i -= DLEN)
+    {
+        t = 0;
+        k = i - DLEN + 1;
+        if (k <= 0)
+        {
+            k = (i <= DLEN && T.flag ? 1 : 0);
+        }
+        for (int j = k; j <= i; j++)
+        {
+            t = t * 10 + ch[j] - '0';
+        }
+        T.a[index++] = t;
+    }
+    return in;
+}
+ostream &operator<<(ostream &out, BigNum &b)
+{ // 重载输出运算符
+    int i;
+    if (b.flag)
+    {
+        cout << "-";
+    }
+    cout << b.a[b.len - 1];
+    for (i = b.len - 2; i >= 0; i--)
+    {
+        cout.width(DLEN);
+        cout.fill('0');
+        cout << b.a[i];
+    }
+    return out;
+}
+
+BigNum BigNum::operator+(const BigNum &T) const
+{ // 两个大数之间的相加运算
+    BigNum t(*this);
+    int i, big; // 位数
+    if (!flag && T.flag)
+    {
+        return T - t;
+    }
+    else if (flag && !T.flag)
+    {
+        return t - T;
+    }
+    big = T.len > len ? T.len : len;
+    for (i = 0; i < big; i++)
+    {
+        t.a[i] += T.a[i];
+        if (t.a[i] > MAXN)
+        {
+            t.a[i + 1]++;
+            t.a[i] -= MAXN + 1;
+        }
+    }
+    if (t.a[big] != 0)
+        t.len = big + 1;
+    else
+        t.len = big;
+    return t;
+}
+BigNum BigNum::operator-(const BigNum &T) const
+{ // 两个大数之间的相减运算
+    int i, j, big;
+    bool flag;
+    BigNum t1, t2;
+    if (this->flag && !T.flag)
+    { // 左负右正
+        t1 = T;
+        t1.flag = true;
+        return *this + t1;
+    }
+    if (!this->flag && T.flag)
+    { // 左正右负
+        t1 = T;
+        t1.flag = false;
+        return *this + t1;
+    }
+    if (*this >= T && !this->flag && !T.flag || this->flag && T.flag && *this < T)
+    {
+        t1 = *this;
+        t2 = T;
+        flag = T.flag;
+    }
+    else
+    {
+        t1 = T;
+        t2 = *this;
+        flag = !T.flag;
+    }
+    big = t1.len;
+    for (i = 0; i < big; i++)
+    {
+        if (t1.a[i] < t2.a[i])
+        {
+            j = i + 1;
+            while (t1.a[j] == 0)
+                j++;
+            t1.a[j--]--;
+            while (j > i)
+                t1.a[j--] += MAXN;
+            t1.a[i] += MAXN + 1 - t2.a[i];
+        }
+        else
+            t1.a[i] -= t2.a[i];
+    }
+    t1.len = big;
+    while (t1.a[len - 1] == 0 && t1.len > 1)
+    {
+        t1.len--;
+        big--;
+    }
+    t1.flag = flag;
+    return t1;
+}
+
+BigNum BigNum::operator*(const BigNum &T) const
+{ // 两个大数之间的相乘运算
+    BigNum ret;
+    if (flag && T.flag || !flag && !T.flag)
+    {
+        ret.flag = false;
+    }
+    else
+        ret.flag = true;
+    int i, j, up;
+    int temp, temp1;
+    for (i = 0; i < len; i++)
+    {
+        up = 0;
+        for (j = 0; j < T.len; j++)
+        {
+            temp = a[i] * T.a[j] + ret.a[i + j] + up;
+            if (temp > MAXN)
+            {
+                temp1 = temp - temp / (MAXN + 1) * (MAXN + 1);
+                up = temp / (MAXN + 1);
+                ret.a[i + j] = temp1;
+            }
+            else
+            {
+                up = 0;
+                ret.a[i + j] = temp;
+            }
+        }
+        if (up != 0)
+            ret.a[i + j] = up;
+    }
+    ret.len = i + j;
+    while (ret.a[ret.len - 1] == 0 && ret.len > 1)
+        ret.len--;
+    return ret;
+}
+BigNum BigNum::operator/(const int &b) const
+{ // 大数对一个整数进行相除运算
+    BigNum ret;
+    int d = abs(b);
+    if (flag && b < 0 || !flag && b > 0)
+    {
+        ret.flag = false;
+    }
+    else
+        ret.flag = true;
+    int i, down = 0;
+    for (i = len - 1; i >= 0; i--)
+    {
+        ret.a[i] = (a[i] + down * (MAXN + 1)) / d;
+        down = a[i] + down * (MAXN + 1) - ret.a[i] * d;
+    }
+    ret.len = len;
+    while (ret.a[ret.len - 1] == 0 && ret.len > 1)
+        ret.len--;
+    if (ret.len == 1 && ret.a[0] == 0)
+    {
+        return 0;
+    }
+    return ret;
+}
+int BigNum::operator%(const int &b) const
+{ // 大数对一个int类型的变量进行取模运算
+    int i, d = 0;
+    for (i = len - 1; i >= 0; i--)
+    {
+        d = ((d * (MAXN + 1)) % b + a[i]) % b;
+    }
+    if (this->flag)
+    {
+        d = -d;
+    }
+    return d;
+}
+BigNum BigNum::operator^(const int &n) const // 大数的n次方运算,仅支持n为正数
+{
+    BigNum t, ret(1);
+    int i;
+    if (n < 0)
+        exit(-1);
+    if (n == 0)
+        return 1;
+    if (n == 1)
+        return *this;
+    int m = n;
+    while (m > 1)
+    {
+        t = *this;
+        for (i = 1; i << 1 <= m; i <<= 1)
+        {
+            t = t * t;
+        }
+        m -= i;
+        ret = ret * t;
+        if (m == 1)
+            ret = ret * (*this);
+    }
+    if (this->flag && (n & 1))
+    {
+        ret.flag = true;
+    }
+    else
+        ret.flag = false;
+    return ret;
+}
+int cmp(BigNum a, BigNum b)
+{ // 0表示a>b 1表示a<b 2表示a==b
+    if (a.flag && !b.flag)
+    { // a负b正
+        return true;
+    }
+    if (!a.flag && b.flag)
+    { // a正b负
+        return false;
+    }
+    if (a.flag)
+    { // 皆正
+        if (a.len < b.len)
+            return false;
+        if (a.len > b.len)
+            return true;
+        for (int i = a.len; i >= 0; i--)
+        {
+            if (a.a[i] < b.a[i])
+                return false;
+            if (a.a[i] > b.a[i])
+                return true;
+        }
+        return 2;
+    }
+    else
+    { // 皆负
+        if (a.len < b.len)
+            return true;
+        if (a.len > b.len)
+            return false;
+        for (int i = a.len; i >= 0; i--)
+        {
+            if (a.a[i] < b.a[i])
+                return true;
+            if (a.a[i] > b.a[i])
+                return false;
+        }
+        return 2;
+    }
+}
+bool BigNum::operator>(const BigNum &T) const
+{ // 大数和另一个大数的大小比较
+    int t = cmp(*this, T);
+    return t == 0;
+}
+bool BigNum::operator>=(const BigNum &T) const
+{ // 大数和另一个大数的大小比较
+    int t = cmp(*this, T);
+    return t == 0 || t == 2;
+}
+bool BigNum::operator<(const BigNum &T) const
+{ // 大数和另一个大数的大小比较
+    int t = cmp(*this, T);
+    return t == 1;
+}
+bool BigNum::operator<=(const BigNum &T) const
+{ // 大数和另一个大数的大小比较
+    int t = cmp(*this, T);
+    return t == 1 || t == 2;
+}
+bool BigNum::operator==(const BigNum &T) const
+{ // 大数和另一个大数的大小比较
+    int t = cmp(*this, T);
+    return t == 2;
+}
+
+void BigNum::print()
+{ // 输出大数
+    int i;
+    if (flag)
+    {
+        cout << "-";
+    }
+    // cout << a[len - 1];
+    pr("%d", a[len - 1]);
+    for (i = len - 2; i >= 0; i--)
+    {
+        /*cout.width(DLEN);
+        cout.fill('0');
+        cout << a[i];*/
+        pr("%04d", a[i]);
+    }
+    // cout << '\n';
+    pr("\n");
+}
+void BigNum::getter()
+{ // test
+    cout << len << " " << flag << '\n';
+}
+void work()
+{
+}
+int main()
+{
+    // ios::sync_with_stdio(0);
+    // cin.tie(0);
+    // cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+24. getTreeDia.cpp
+------------------
+/*ordinary.exe*/
+#include<bits/stdc++.h>
+using namespace std;
+using i64=long long ;
+using u64=unsigned long long ;
+const int N=1e5+1;
+int n,dis[N];
+struct edge{
+    int u,w;
+};
+vector<edge>g[N];
+void dfs(int u,int fa,int w)
+{
+    dis[u]=w;
+    for(auto i:g[u])
+        if(i.u!=fa)dfs(i.u,u,dis[u]+i.w);
+} 
+void work()
+{
+    int n,m;cin>>n>>m;
+    for(int i=1;i<=m;++i)
+    {
+        int v,u,w;cin>>u>>v>>w;
+        char c;cin>>c;
+        g[u].emplace_back(v,w);
+        g[v].emplace_back(u,w);
+    }
+    dfs(1,-1,0);
+    int ans=1;
+    for(int i=1;i<=n;++i)if(dis[i]>dis[ans])ans=i;
+    dfs(ans,-1,0);
+    for(int i=1;i<=n;++i)if(dis[i]>dis[ans])ans=i;
+    i64 res=dis[ans];
+    ans=ans*10+(ans*(ans+1)>>1);
+    cout<<res<<'\n';
+}
+int main() {
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t=1;
+// cin >> t;
+while(t--)
+work();
+}
+
+25. HLD.cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 1e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+ll n, m, r, p;
+// 加法线段树
+ll lz[N << 2], t[N << 2], a[N << 2];
+ll mo(ll x)
+{
+    return (x % p + p) % p;
+}
+void update(ll s, ll e, ll o, ll x)
+{
+    t[o] += mo((e - s + 1) * x);
+    lz[o] = mo(lz[o] + x);
+}
+void pushdown(ll s = 1, ll e = n, ll o = 1)
+{
+    ll mid = (s + e) >> 1, ls = o << 1, rs = o << 1 | 1;
+    update(s, mid, ls, lz[o]);
+    update(mid + 1, e, rs, lz[o]);
+    lz[o] = 0;
+}
+void pushup(int v)
+{
+    t[v] = mo(t[v << 1] + t[v << 1 | 1]);
+}
+void build(ll s = 1, ll e = n, ll o = 1)
+{
+    if (s == e)
+        return t[o] = mo(a[s]), void();
+    ll mid = (s + e) >> 1;
+    build(s, mid, o << 1);
+    build(mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+void Add(ll l, ll r, ll x, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e) // 当se区间被lr区间完全包含时更新
+        return update(s, e, o, x), void();
+    pushdown(s, e, o);
+    ll mid = (s + e) >> 1;
+    if (mid >= l)
+        Add(l, r, x, s, mid, o << 1);
+    if (mid+1 <= r)
+        Add(l, r, x, mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+ll query(ll l, ll r, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e)
+        return t[o];
+    pushdown(s, e, o);
+    ll mid = (s + e) >> 1;
+    ll res = 0;
+    if (mid >= l)
+        res = mo(res + query(l, r, s, mid, o << 1));
+    if (mid + 1 <= r)
+        res = mo(res + query(l, r, mid + 1, e, o << 1 | 1));
+    return res;
+}
+// 重链剖分求LCA
+vector<int> g[N];
+int fa[N], son[N], top[N], dep[N], sz[N], dfn[N];
+void dfs1(int x, int pre)
+{
+    dep[x] = dep[pre] + 1;
+    sz[x] = 1;
+    fa[x] = pre;
+    for (const auto &y : g[x])
+    {
+        if (y == pre)
+            continue;
+        dfs1(y, x);
+        sz[x] += sz[y];
+        if (sz[y] > sz[son[x]])
+            son[x] = y;
+    }
+}
+int idx = 0;
+void dfs2(int x, int t)
+{
+    dfn[x] = ++idx;
+    top[x] = t;
+    // 先走重儿子
+    if (son[x])
+        dfs2(son[x], t);
+    // 再走轻儿子
+    for (const auto &y : g[x])
+    {
+        if (y == fa[x] || y == son[x])
+            continue;
+        dfs2(y, y);
+    }
+}
+void solve()
+{
+    cin >> n >> m >> r >> p;
+    for (int i = 1; i <= n; ++i)
+        cin >> a[i];
+    for (int i = 1; i < n; ++i)
+    {
+        int x, y;
+        cin >> x >> y;
+        g[x].pb(y);
+        g[y].pb(x);
+    }
+    // 树剖
+    dfs1(r, 0);
+    dfs2(r, r);
+
+    for (int i = 1; i <= n; ++i)
+        Add(dfn[i], dfn[i], a[i]);
+
+    while (m--)
+    {
+        int op;
+        cin >> op;
+        if (op == 1)
+        {
+            int x, y, z;//x->y的路径上+z
+            cin >> x >> y >> z;
+            while (top[x] != top[y])
+            {
+                if (dep[top[x]] < dep[top[y]])
+                    swap(x, y);
+                // 将这条链上top[x]->x的结点加上z
+                Add(dfn[top[x]], dfn[x], z);
+                x = fa[top[x]];
+            }
+            if (dep[x] < dep[y])
+                swap(x, y);
+            Add(dfn[y], dfn[x], z);
+        }
+        else if (op == 2)
+        {
+            int x, y;//求x->y路径和
+            cin >> x >> y;
+            ll ans = 0;
+            while (top[x] != top[y])
+            {
+                if (dep[top[x]] < dep[top[y]])
+                    swap(x, y);
+                // 将这条链上top[x]->x的结点加上
+                ans = mo(ans + query(dfn[top[x]], dfn[x]));
+                x = fa[top[x]];
+            }
+            if (dep[x] < dep[y])
+                swap(x, y);
+            ans = mo(ans + query(dfn[y], dfn[x]));
+            cout << ans << '\n';
+        }
+        else if (op == 3)
+        {
+            int x, z;//x结点的所有子节点加上z
+            cin >> x >> z;
+            Add(dfn[x], dfn[x] + sz[x] - 1, z);
+        }
+        else if (op == 4)
+        {
+            int x;//求x结点的所有子节点和
+            cin >> x;
+            cout << query(dfn[x], dfn[x] + sz[x] - 1) << '\n';
+        }
+    }
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+26. HM.cpp
+------------------
+/*🫵😉👍*/
+#include<bits/stdc++.h>
+#include<iostream>
+#include<iomanip>
+#include<cstdio>
+#include<cstring>
+#include<vector>
+#include<map>
+#include<stack>
+#include<math.h>
+#include<stdlib.h>
+#include<queue>
+#include<set>
+#include<string.h>
+#include<string>
+#include<stdio.h>
+#include<deque>
+#include<numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(),v.end()
+#define pb push_back
+#define lowbit(x) (x&-x)
+#define fixed(x) fixed<<setprecision(x)
+#define lcm(x,y) x*y/__gcd(x,y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false),cin.tie(0),cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6+10, base = 13331, mod = 1e9 + 7;
+const ull INF=1e18;
+const double pie=acos(-1),eps=1e-8;
+int dir[]={0,1,0,-1,0};
+const int dx[]={1,1,1,0,0,-1,-1,-1};
+const int dy[]={1,0,-1,-1,0,1,-1};
+typedef pair<ll, ll>PAIR;
+//启发式合并
+int n,q;
+set<int>st[N];
+void solve(){
+    cin>>n>>q;
+    for(int i=1;i<=n;++i)
+    {
+        int c;cin>>c;
+        st[i].insert(c);
+    }
+    while(q--)
+    {
+        int x,y;cin>>x>>y;
+        if(SZ(st[x])>SZ(st[y])) swap(st[x],st[y]);
+        for(auto it:st[x]) st[y].insert(it);
+        st[x].clear();
+        cout<<SZ(st[y])<<'\n';
+    }
+
+}
+signed main(){
+    io;
+    ll _ = 1;
+    //cin >> _;
+    while(_ -- ) solve();
+    return 0;
+}
+
+27. I128.cpp
+------------------
+/* I128.cpp */
+#include <bits/stdc++.h>
+using namespace std;
+using i128 = __int128;
+string to_string_i128(i128 x) {
+    if (x == 0) return "0";
+    bool neg = x < 0;
+    if (neg) x = -x;
+    string res;
+    while (x > 0) {
+        res.push_back('0' + x % 10);
+        x /= 10;
+    }
+    if (neg) res.push_back('-');
+    reverse(res.begin(), res.end());
+    return res;
+}
+i128 read_i128() {
+    string s;
+    cin >> s;
+    bool neg = false;
+    i128 res = 0;
+    int i = 0;
+    if (s[0] == '-') { neg = true; i = 1; }
+    for (; i < (int)s.size(); i++) res = res * 10 + (s[i] - '0');
+    if (neg) res = -res;
+    return res;
+}
+ostream& operator<<(ostream &os, i128 x) {
+    os << to_string_i128(x);
+    return os;
+}
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    // 读入 i128
+    cout << "请输入两个 i128 数字:" << endl;
+    i128 a = read_i128();
+    i128 b = read_i128();
+    // 加减乘除
+    i128 sum = a + b;
+    i128 diff = a - b;
+    i128 prod = a * b;
+    i128 quot = 0;
+    if (b != 0) quot = a / b;
+    cout << "a + b = " << sum << "\n";
+    cout << "a - b = " << diff << "\n";
+    cout << "a * b = " << prod << "\n";
+    if (b != 0) cout << "a / b = " << quot << "\n";
+    long long c = 1234567890123456789LL;
+    i128 d = a + c;
+    cout << "a + c = " << d << "\n";
+
+    return 0;
+}
+
+28. Johnson.cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 3e3 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ll INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+//Johnson单源最短路
+struct Edge
+{
+    ll x, w;
+    bool operator<(const Edge &u) const
+    {
+        return w == u.w ? x < u.x : w > u.w;
+    }
+};
+ll h[N], d[N][N], n, m;
+vector<Edge> g[N];
+bool spfa(int st)
+{
+    for (int i = 1; i <= n; ++i)
+        h[i] = INF;
+    h[st] = 0;
+    bitset<N> inq;
+    queue<int> q;
+    vector<int> cnt(n + 1);
+    q.push(st);
+    inq[st] = 1;
+    while (SZ(q))
+    {
+        int x = q.front();
+        q.pop();
+        inq[x] = 0;
+        for (const auto &[y, w] : g[x])
+        {
+            if (h[x] + w < h[y])
+            {
+                if (++cnt[y] > n)
+                    return 1;
+                h[y] = h[x] + w;
+                if (!inq[y])
+                    q.push(y), inq[y] = 1;
+            }
+        }
+    }
+    return 0;
+}
+void dijkstra(int st, ll d[])
+{
+    for (int i = 1; i <= n; ++i)
+        d[i] = INF;
+    priority_queue<Edge> pq;
+    bitset<N> vis;
+    pq.push({st, d[st] = 0});
+    while (SZ(pq))
+    {
+        int x = pq.top().x;
+        pq.pop();
+        if (vis[x])
+            continue;
+        vis[x] = 1;
+        for (const auto &[y, w] : g[x])
+        {
+            if (d[x] + w < d[y])
+            {
+                d[y] = d[x] + w;
+                pq.push({y, d[y]});
+            }
+        }
+    }
+    // 还原结果
+    for (int i = 1; i <= n; ++i)
+        d[i] = d[i] - h[st] + h[i];
+}
+void solve()
+{
+    cin >> n >> m;
+    for (int i = 1; i <= m; i++)
+    {
+        ll u, v, w;
+        cin >> u >> v >> w;
+        g[u].pb({v, w});
+    }
+    // 1.建立虚拟源点
+    for (int i = 1; i <= n; ++i)
+        g[0].pb({i, 0}), h[i] = INF;
+    // 2.Bellman-Ford算法求0点到所有点的单源最短路
+    if (spfa(0))
+    {
+        cout << "-1\n";
+        return;
+    }
+    // 3.改造所有边
+    for (int x = 1; x <= n; ++x)
+        for (auto &[y, w] : g[x])
+            w = w + h[x] - h[y];
+    // 4.对每个点Dijkstra
+    for (int i = 1; i <= n; ++i)
+        dijkstra(i, d[i]);
+    for (int x = 1; x <= n; ++x)
+    {
+        for (int y = 1; y <= n; ++y)
+        {
+            if (y != 1)
+                cout << ' ';
+            if (d[x][y] >= INF / 2)
+                cout << "-1";
+            else
+                cout << d[x][y];
+        }
+        cout << "\n";
+    }
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+29. kbase.cpp
+------------------
+/*blank*/
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long//一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+ll trK_10(string s,int k)
+{
+    ll res=0;
+    ll a=1;
+    for(int i=s.size()-1;i>=0;--i)
+    {
+        if(s[i]>='0'&&s[i]<='9')res+=(s[i]-'0')*a;
+        else res+=(s[i]-'A'+10)*a;
+        a*=k;
+    }
+    return res;
+}
+string tr10_k(ll num,int k)
+{
+    if (num == 0)
+        return "0"; 
+    string res;
+    while(num)
+    {
+        int tmp=num%k;
+        if(tmp<10)res=char(tmp+'0')+res;
+        else res=char(tmp-10+'A')+res;
+        num/=k;
+    }
+    return res;
+}
+void work()
+{
+    cout<<trK_10("101",2);
+    cout<<tr10_k(5,2);
+}
+int main()
+{
+ios::sync_with_stdio(0);
+cin.tie(0);
+cout.tie(0);
+int _=1;
+//cin >> _;
+//sc("%d",&_);
+while (_--)work();
+return 0;
+}
+
+30. KMP.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+const int mx = 1e6 + 9;
+char s[mx], t[mx];
+string str, tstr;
+int nex[mx];
+void work()
+{
+    cin >> tstr >> str;
+    int n = str.size(), m = tstr.size();
+    for (int i = 1; i <= n; ++i)
+        s[i] = str[i - 1];
+    for (int i = 1; i <= m; ++i)
+        t[i] = tstr[i - 1];
+    s[n + 1] = '#', t[m + 1] = '$';
+    // getnex
+    nex[1] = 0;
+    for (int i = 2, j = 0; i <= m; ++i)
+    {
+        while (j && t[i] != t[j + 1])
+            j = nex[j];
+        if (t[i] == t[j + 1])
+            j++;
+        nex[i] = j;
+    }
+    for (int i = 1, j = 0; i <= n; ++i)
+    {
+        while (j && t[j + 1] == s[i])
+            j = nex[j];
+        if (t[j + 1] == s[i])
+            j++;
+    }
+    for (int i = 1; i <= m; ++i)
+        cout << nex[i] << ' ';
+    cout << '\n';
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+31. LCA.cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+int fa[N][30],dep[N];
+const int T=20;
+vector<int>g[N];
+//倍增求lca
+void dfs(int x)
+{
+    dep[x]=dep[fa[x][0]]+1;
+    for(int i=1;i<=T;++i)
+    {
+        fa[x][i]=fa[fa[x][i-1]][i-1];
+    }
+    for(const auto&y:g[x])
+    {
+        dfs(y);
+    }
+}
+int lca(int x,int y)
+{
+    if(dep[x]<dep[y])swap(x,y);
+    //使得dep[x]>=dep[y]
+    for(int i=T;i>=0;--i)
+    {
+        if(dep[fa[x][i]]>=dep[y])x=fa[x][i];
+
+    }
+    if(x==y)return x;
+    for(int i=T;i>=0;--i)
+    {
+        if(fa[x][i]!=fa[y][i])
+        {
+            x=fa[x][i];
+            y=fa[y][i];
+        }
+    }
+    return fa[x][0];
+}
+void solve()
+{
+    int n;
+    cin >> n;
+    for (int i = 2; i <= n; ++i)
+    {
+        cin >> fa[i][0];
+        g[fa[i][0]].pb(i);
+    }
+    dfs(1);
+    int q;
+    cin >> q;
+    while (q--)
+    {
+        int x, y;
+        cin >> x >> y;
+        cout << lca(x, y) << '\n';
+    }
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+32. LCA(HLD).cpp
+------------------
+/*🫵😉👍*/
+#include<bits/stdc++.h>
+#include<iostream>
+#include<iomanip>
+#include<cstdio>
+#include<cstring>
+#include<vector>
+#include<map>
+#include<stack>
+#include<math.h>
+#include<stdlib.h>
+#include<queue>
+#include<set>
+#include<string.h>
+#include<string>
+#include<stdio.h>
+#include<deque>
+#include<numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(),v.end()
+#define pb push_back
+#define lowbit(x) (x&-x)
+#define fixed(x) fixed<<setprecision(x)
+#define lcm(x,y) x*y/__gcd(x,y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false),cin.tie(0),cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6+10, base = 13331, mod = 1e9 + 7;
+const ull INF=1e18;
+const double pie=acos(-1),eps=1e-8;
+int dir[]={0,1,0,-1,0};
+const int dx[]={1,1,1,0,0,-1,-1,-1};
+const int dy[]={1,0,-1,-1,0,1,-1};
+typedef pair<ll, ll>PAIR;
+//重链剖分求LCA
+vector<int>g[N];
+int fa[N],son[N],top[N],dep[N],sz[N];
+void dfs1(int x,int pre)
+{
+    dep[x]=dep[pre]+1;
+    sz[x]=1;
+    for(const auto&y:g[x])
+    {
+        dfs1(y,x);
+        sz[x]+=sz[y];
+        if(sz[y]>sz[son[x]])son[x]=y;
+    }
+}
+
+void dfs2(int x,int t)
+{
+    top[x]=t;
+    //先走重儿子
+    if(son[x])dfs2(son[x],t);
+    for(const auto&y:g[x])
+    {
+        if(y==son[x]) continue;
+        dfs2(y,y);
+    }
+}
+int lca(int x,int y)
+{
+    while(top[x]!=top[y])
+    {
+        //top偏下的往上跳
+        if(dep[top[x]]<dep[top[y]])swap(x,y);
+        x=fa[top[x]];
+    }
+    if(dep[x]<dep[y])swap(x,y);
+    return y;
+}
+void solve(){
+    int n;cin>>n;
+    for(int i=2;i<=n;++i)
+    {
+        cin>>fa[i];
+        g[fa[i]].pb(i);
+    }
+    dfs1(1,0);
+    dfs2(1,1);//以1为根
+    int m;
+    cin>>m;
+    while(m--){
+        int x,y;
+        cin>>x>>y;
+        cout<<lca(x,y)<<'\n';
+    }
+}
+signed main(){
+    io;
+    ll _ = 1;
+    //cin >> _;
+    while(_ -- ) solve();
+    return 0;
+}
+
+33. LCA(Tarjan).cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<int, int> PAIR;
+int fa[N], dep[N];
+const int T = 20;
+vector<int> g[N];
+// Tarjan求lca
+int pre[N], ans[N];
+int root(int x) { return pre[x] = (pre[x] == x ? x : root(pre[x])); }
+vector<PAIR> Q[N];
+bitset<N> vis;
+void merge(int x, int y)
+{
+    // 深度大到深度小
+    int fx = root(x), fy = root(y);
+    if (dep[fx] < dep[fy])
+        swap(fx, fy);
+    pre[fx] = fy;
+}
+void dfs(int x)
+{
+    dep[x] = dep[fa[x]] + 1;
+    vis[x] = 1;
+    // 1.处理儿子
+    for (const auto &y : g[x])
+        dfs(y);
+    // 2.处理自己的询问
+    for (const auto &[y, i] : Q[x])
+    {
+        if (!vis[y])
+            continue;
+        ans[i] = root(y);
+    }
+    merge(x, fa[x]);
+}
+void solve()
+{
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; ++i)
+        pre[i] = i;
+    for (int i = 2; i <= n; ++i)
+    {
+        cin >> fa[i];
+        g[fa[i]].pb(i);
+    }
+    int q;
+    cin >> q;
+    for (int i = 1; i <= q; ++i)
+    {
+        int x, y;
+        cin >> x >> y;
+        Q[x].pb({y, i});
+        Q[y].pb({x, i});
+    }
+    dfs(1);
+    for (int i = 1; i <= q; ++i)
+        cout << ans[i] << '\n';
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    // cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+34. Lucas.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64=long long;
+using u64=unsigned long long;
+const int N=2e5+5;
+i64 fac[N],invfac[N];
+i64 qp(i64 a,i64 b,i64 p)
+{
+    i64 ans=1;
+    a%=p;
+    while(b)
+    {
+        if(b&1)ans=(ans*a)%p;
+        a=a*a%p;
+        b>>=1;
+    }
+    return ans;
+}
+i64 inv(i64 x,i64 p){return qp(x,p-2,p);}
+i64 C(i64 n,i64 m,i64 p)
+{
+    if(n < m || m < 0) return 0;
+	return fac[n] * invfac[m] % p * invfac[n - m] % p;
+}
+i64 lucas(i64 n,i64 m,i64 p)
+{
+    if(!m)return 1;
+    return lucas(n/p,m/p,p)*C(n%p,m%p,p)%p;
+}
+void work()
+{
+    i64 n,m,p;  
+    cin>>n>>m>>p;
+    fac[0]=1;
+    for(int i=1;i<p;++i)
+    fac[i]=fac[i-1]*i%p;
+    invfac[p-1]=inv(fac[p-1],p);
+    for(int i=p-2;i>=0;--i)
+    invfac[i]=invfac[i+1]*(i+1)%p;
+    cout<<lucas(n+m,n,p)<<'\n';
+}
+int main() {
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t=1;
+cin >> t;
+while(t--)
+work();
+}
+
+35. Manacher.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64=long long;
+const int N=2e7+9;
+string str;
+char s[N];
+int n,p[N];
+void work()
+{
+    cin>>str;
+    n=(int)str.size();
+    for(int i=1;i<=n;++i)s[i]=str[i-1];
+    for(int i=2*n+1;i>=1;--i)
+    {
+        if(i&1)s[i]='#';
+        else s[i]=s[i>>1];
+    }
+    s[0]='$',s[2*n+2]='^';
+    int C=0,R=0,ans=1;
+    for(int i=1;i<=2*n+1;++i)
+    {
+        p[i]=i<R?min(R-i,p[2*C-i]):1;
+        while(s[i+p[i]]==s[i-p[i]])p[i]++;
+        if(p[i]+i>R){
+            C=i;
+            R=i+p[i];
+        }
+    }
+    for(int i=1;i<=2*n+1;++i)
+        ans=max(ans,p[i]-1);
+    cout<<ans<<'\n';
+}
+int main() {
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t=1;
+// cin >> t;
+while(t--)
+work();
+}
+
+36. MathGeo.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+const int N = 1e3 + 10;
+const int mod = 1e9 + 7;
+typedef pair<int, int> PII;
+
+//--------------------------------------------------------------
+const double eps = 1e-9;
+const double pi = acos(-1);
+inline double sqr(double x) { return x * x; } // 平方
+int sign(double x)
+{
+	if (fabs(x) < eps)
+		return 0;
+	if (x > 0)
+		return 1;
+	return -1;
+} // 符号
+struct point
+{
+	double x, y;
+	point() {}
+	point(double a, double b) : x(a), y(b) {}
+	friend point operator+(const point &a, const point &b)
+	{
+		return point(a.x + b.x, a.y + b.y);
+	}
+	friend point operator-(const point &a, const point &b)
+	{
+		return point(a.x - b.x, a.y - b.y);
+	}
+	friend bool operator==(const point &a, const point &b)
+	{
+		return !sign(a.x - b.x) && !sign(a.y - b.y);
+	}
+	friend point operator*(const point &a, const double &b)
+	{
+		return point(a.x * b, a.y * b);
+	}
+	friend point operator*(const double &a, const point &b)
+	{
+		return point(a * b.x, a * b.y);
+	}
+	friend point operator/(const point &a, const double &b)
+	{
+		return point(a.x / b, a.y / b);
+	}
+	// 向量模长
+	double norm()
+	{
+		return sqrt(sqr(x) + sqr(y));
+	}
+};
+
+struct line
+{
+	point a, b;
+	line() {}
+	line(point x, point y) : a(x), b(y) {}
+};
+
+double det(const point &a, const point &b)
+{
+	return a.x * b.y - a.y * b.x;
+} // 叉积 判断两点共线 ,绝对值等于两个向量所构成的平行四边形面积
+
+double dot(const point &a, const point &b)
+{
+	return a.x * b.x + a.y * b.y;
+} // 点积
+
+double dist(const point &a, const point &b)
+{
+	return (a - b).norm();
+} // 两点距离
+
+point rotate_point(const point &a, const point &p, double A)
+{
+	double tx = p.x - a.x, ty = p.y - a.y;
+	return point(a.x + tx * cos(A) - ty * sin(A), a.y + tx * sin(A) + ty * cos(A));
+} // p 点 绕 a 点逆时针旋转 A 弧度
+
+int toleft(const point &p, const point &a, const point &b)
+{
+	return sign(det(b - a, p - a));
+	// 1 左 0 上 -1 右
+} // 只适用凸多边形
+
+// 判断点 p 是否在线段 st 上(包括端点)
+bool point_on_segment(point p, point s, point t)
+{
+	return sign(det(p - s, t - s)) == 0 && sign(dot(p - s, p - t)) <= 0;
+}
+
+bool parallel(line a, line b)
+{
+	return !sign(det(a.a - a.b, b.a - b.b));
+} // 判断两个直线是否平
+bool line_make_point(line a, line b, point &res)
+{
+	if (parallel(a, b))
+		return 0;
+	double s1 = det(a.a - b.a, b.b - b.a);
+	double s2 = det(a.b - b.a, b.b - b.a);
+	res = (s1 * a.b - s2 * a.a) / (s1 - s2);
+	return 1;
+} //
+int n, m;
+struct node
+{
+	double x, y, dis;
+};
+vector<node> ans[N];
+void work()
+{
+	cin >> n >> m;
+	double xs, ys, xt, yt;
+	cout << fixed << setprecision(10);
+	cin >> xs >> ys >> xt >> yt;
+	point s, t;
+	s = {xs, ys}, t = {xt, yt};
+	line l = {s, t};
+	vector<point> p(n + 1);
+	for (int i = 1; i <= n; ++i)
+		cin >> p[i].x >> p[i].y;
+	point now;
+	for (int i = 1; i <= n; ++i)
+	{
+		for (int j = i + 1; j <= n; ++j)
+		{
+			auto p1 = p[i];
+			auto p2 = p[j];
+			if (toleft(s, p1, p2) * toleft(t, p1, p2) > 0)
+				continue;
+			line r = {p1, p2};
+			line_make_point(l, r, now);
+			ans[i].emplace_back(now.x, now.y, dist(now, s));
+			ans[j].emplace_back(now.x, now.y, dist(now, s));
+		}
+	}
+	int h, k;
+	for (int i = 1; i <= n; ++i)
+		sort(ans[i].begin(), ans[i].end(),
+			 [&](node a, node b)
+			 { return a.dis < b.dis; });
+	for (int i = 1; i <= m; ++i)
+	{
+		cin >> h >> k;
+		if (ans[h].size() < k)
+			cout << "-1\n";
+		else cout << ans[h][k - 1].x << ' ' << ans[h][k - 1].y << '\n';
+	}
+}
+int main()
+{
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int t = 1;
+	// cin >> t;
+	while (t--)
+		work();
+}
+
+37. Max-flow.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+constexpr int inf = 1E9;
+template <class T>
+struct MaxFlow
+{
+    struct _Edge
+    {
+        int to;
+        T cap;
+        _Edge(int to, T cap) : to(to), cap(cap) {}
+    };
+
+    int n;
+    std::vector<_Edge> e;
+    std::vector<std::vector<int>> g;
+    std::vector<int> cur, h;
+
+    MaxFlow() {}
+    MaxFlow(int n)
+    {
+        init(n);
+    }
+
+    void init(int n)
+    {
+        this->n = n;
+        e.clear();
+        g.assign(n, {});
+        cur.resize(n);
+        h.resize(n);
+    }
+
+    bool bfs(int s, int t)
+    {
+        h.assign(n, -1);
+        std::queue<int> que;
+        h[s] = 0;
+        que.push(s);
+        while (!que.empty())
+        {
+            const int u = que.front();
+            que.pop();
+            for (int i : g[u])
+            {
+                auto [v, c] = e[i];
+                if (c > 0 && h[v] == -1)
+                {
+                    h[v] = h[u] + 1;
+                    if (v == t)
+                    {
+                        return true;
+                    }
+                    que.push(v);
+                }
+            }
+        }
+        return false;
+    }
+
+    T dfs(int u, int t, T f)
+    {
+        if (u == t)
+        {
+            return f;
+        }
+        auto r = f;
+        for (int &i = cur[u]; i < int(g[u].size()); ++i)
+        {
+            const int j = g[u][i];
+            auto [v, c] = e[j];
+            if (c > 0 && h[v] == h[u] + 1)
+            {
+                auto a = dfs(v, t, std::min(r, c));
+                e[j].cap -= a;
+                e[j ^ 1].cap += a;
+                r -= a;
+                if (r == 0)
+                {
+                    return f;
+                }
+            }
+        }
+        return f - r;
+    }
+    void addEdge(int u, int v, T c)
+    {
+        g[u].push_back(e.size());
+        e.emplace_back(v, c);
+        g[v].push_back(e.size());
+        e.emplace_back(u, 0);
+    }
+    T flow(int s, int t)
+    {
+        T ans = 0;
+        while (bfs(s, t))
+        {
+            cur.assign(n, 0);
+            ans += dfs(s, t, std::numeric_limits<T>::max());
+        }
+        return ans;
+    }
+
+    std::vector<bool> minCut()
+    {
+        std::vector<bool> c(n);
+        for (int i = 0; i < n; i++)
+        {
+            c[i] = (h[i] != -1);
+        }
+        return c;
+    }
+
+    struct Edge
+    {
+        int from;
+        int to;
+        T cap;
+        T flow;
+    };
+    std::vector<Edge> edges()
+    {
+        std::vector<Edge> a;
+        for (int i = 0; i < e.size(); i += 2)
+        {
+            Edge x;
+            x.from = e[i + 1].to;
+            x.to = e[i].to;
+            x.cap = e[i].cap + e[i + 1].cap;
+            x.flow = e[i + 1].cap;
+            a.push_back(x);
+        }
+        return a;
+    }
+};
+void work()
+{
+    int n, m, s, t;
+    cin >> n >> m >> s >> t;
+    MaxFlow<i64> mf(n + 1);
+    for (int i = 0; i < m; ++i)
+    {
+        int u, v;
+        i64 c;
+        cin >> u >> v >> c;
+        mf.addEdge(u, v, c);
+    }
+    cout << mf.flow(s, t) << '\n';
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+38. Miller-Rabin.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64=long long;
+using u64=unsigned long long;
+using i128 = __int128;
+i128 qpow(i128 a, i128 b, i128 mod) {
+    i128 res = 1;
+    a %= mod;
+    while (b) {
+        if (b & 1) res = res * a % mod;
+        a = a * a % mod;
+        b >>= 1;
+    }
+    return res;
+}
+bool MillerRabin(i128 n, int k = 10) {
+    if (n < 2) return false;
+    if (n == 2 || n == 3) return true;
+    if (n % 2 == 0) return false;
+
+    i128 d = n - 1;
+    int s = 0;
+    while (d % 2 == 0) {
+        d /= 2;
+        ++s;
+    }
+
+    srand(time(0));
+    for (int i = 0; i < k; ++i) {
+        i128 a = rand() % (n - 3) + 2;
+        i128 x = qpow(a, d, n);
+        if (x == 1 || x == n - 1) continue;
+
+        bool flag = false;
+        for (int r = 1; r < s; ++r) {
+            x = x * x % n;
+            if (x == n - 1) {
+                flag = true;
+                break;
+            }
+        }
+        if (!flag)
+            return false;
+    }
+    return true;
+}
+void print_i128(i128 n) {
+    if (n == 0) {
+        putchar('0');
+        return;
+    }
+    char buf[50];
+    int len = 0;
+    while (n) {
+        buf[len++] = n % 10 + '0';
+        n /= 10;
+    }
+    for (int i = len - 1; i >= 0; --i)
+        putchar(buf[i]);
+    putchar('\n');
+}
+void work()
+{
+    i64 x;
+    while(cin>>x)
+        cout<<(MillerRabin(x)?"Y\n":"N\n");
+}
+int main() {
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t=1;
+// cin >> t;
+while(t--)
+work();
+}
+
+39. mod.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64=long long;
+void work()
+{
+    
+}
+int main() {
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t;
+cin >> t;
+while(t--)
+work();
+}
+
+40. MST_kruskal.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+const int N = 2e5 + 5;
+i64 n, m,w,v,u,ans,pre[N];
+struct edge
+{
+    i64 u, v, w;
+    bool operator<(const edge &a) const
+    {
+        return w == a.w ? (u == a.u ? v < a.v : u < a.u) : w < a.w;
+    }
+};
+i64 root(i64 v) { return pre[v] == v ? v : pre[v] = root(pre[v]); }
+vector<edge>es;
+void work()
+{
+    cin >> n >> m;
+    for(int i=1;i<=n;++i)pre[i]=i;
+    for(int i=1;i<=m;++i)
+    {
+        cin>>u>>v>>w;
+        es.push_back({u,v,w});
+    }
+    sort(begin(es),end(es));
+    for(auto&[u1,v1,w]:es)
+    {
+        if(root(u1)==root(v1))continue;
+        pre[root(u1)]=root(v1);
+        ans+=w;
+    }
+    for(int i=1;i<n;++i)if(root(i)!=root(i+1))return void(cout<<"-1\n");
+    cout<<ans<<'\n';
+    
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t=1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+41. MST_prim.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+// prim LST
+const int mx = 2e5 + 1;
+const ll inf = 4e18;
+struct edge
+{
+    ll v, w;
+    bool operator<(const edge &a) const
+    {
+        return w == a.w ? v < a.v : w > a.w;
+    }
+};
+vector<edge> es[mx];
+ll n,m;
+ll d[mx],u,v,w;
+bitset<mx> intree;
+void work()
+{
+    cin>>n>>m;
+    fill(begin(d),end(d),inf);
+    for(int i=1;i<=m;++i)
+    {
+        cin>>u>>v>>w;
+        es[u].push_back({v,w});
+        es[v].push_back({u,w});
+    }
+    priority_queue<edge>pq;
+    pq.push({1,0});
+    d[1]=0;
+    ll ans=0;
+    while(pq.size())
+    {
+        int x=pq.top().v;
+        pq.pop();
+        if(intree[x])continue;
+        intree[x]=1;
+        ans+=d[x];
+        d[x]=0;
+        for(auto&[y,w]:es[x])
+        {
+            if(!intree[y]&&d[y]>w)
+            {
+                d[y]=w; 
+                pq.push({y,w});
+            }
+        }
+    }
+    for(int i=1;i<=n;++i)if(!intree[i]){ans=-1;break;}
+    cout<<ans<<'\n';
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+42. MST.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+const int N = 1e5 + 9;
+const ll inf = 2e18;
+
+struct Edge
+{
+    ll x, y, w;
+};
+vector<Edge> es;
+int pre[N], n, m;
+int root(int x) { return pre[x] = (pre[x] == x ? x : root(pre[x])); }
+
+void work()
+{
+    cin >> n >> m;
+    for (int i = 1; i <= m; ++i)
+    {
+        ll x, y, w;
+        cin >> x >> y >> w;
+        es.push_back({x, y, w});
+    }
+    for (int i = 1; i <= n; ++i)
+        pre[i] = i;
+
+    sort(es.begin(), es.end(), [](const Edge &u, const Edge &v)
+         {
+   	if(u.w != v.w)return u.w < v.w;
+   	return u.x < v.x; });
+    ll ans = 0;
+    for (const auto &t : es)
+    {
+        ll x = t.x, y = t.y, w = t.w;
+        int rx = root(x), ry = root(y);
+        if (rx != ry)
+        {
+            // 选中了这条边
+            ans += w;
+            pre[rx] = ry;
+        }
+    }
+    for (int i = 2; i <= n; ++i)
+    {
+        if (root(i) != root(1))
+        {
+            cout << -1 << '\n';
+            return;
+        }
+    }
+    cout << ans << '\n';
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+43. OpOverload.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+
+using i64 = long long;
+struct Node
+{
+    int a, b;
+    // 小于号，默认升序排序
+    bool operator<(const Node &other) const
+    {
+        return a < other.a;
+    }
+    // 大于号，降序排序用
+    bool operator>(const Node &other) const
+    {
+        return a > other.a;
+    }
+    // 等于号
+    bool operator==(const Node &other) const
+    {
+        return a == other.a && b == other.b;
+    }
+    // 不等于号
+    bool operator!=(const Node &other) const
+    {
+        return !(*this == other);
+    }
+    // 加法
+    Node operator+(const Node &other) const
+    {
+        return {a + other.a, b + other.b};
+    }
+    // 减法
+    Node operator-(const Node &other) const
+    {
+        return {a - other.a, b - other.b};
+    }
+    // 输出流（调试超好用）
+    friend std::ostream &operator<<(std::ostream &os, const Node &node)
+    {
+        return os << "(" << node.a << ", " << node.b << ")";
+    }
+};
+void work()
+{
+     Node x = {3, 5}, y = {2, 7};
+    // 比较
+    std::cout << (x < y) << '\n';
+    std::cout << (x == y) << '\n';
+    // 加减
+    Node z = x + y;
+    std::cout << z << '\n';
+    // 排序
+    std::vector<Node> v = {{3, 5}, {2, 7}, {8, 1}};
+    std::sort(v.begin(), v.end()); // 默认按 a 升序
+    for (auto& i : v) std::cout << i << " ";
+    std::cout << '\n';
+}
+int main()
+{
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int _ = 1;
+    // std::cin>>_;
+    while (_--)
+        work();
+    return 0;
+}
+
+44. PST.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+#define ll long long
+using namespace std;
+const int N=2e5+9;
+const ll inf=2e18;
+int n,idx;
+struct Node{
+    int ls,rs,val;
+} t[N<<5];
+vector<int>X;
+int a[N],rt[N];
+int bin(int x){return lower_bound(X.begin(),X.end(),x)-X.begin()+1;}
+void insert(int &o,int pre,int val,int s=1,int e=n)
+{
+    //分配节点
+    o=++idx;
+    //复刻上一个版本
+    t[o]=t[pre];
+    //修改自身的权值
+    t[o].val++;
+    if(s==e)return;
+    //决策下一步
+    int mid=(s+e)>>1;
+    if(val<=mid)insert(t[o].ls,t[pre].ls,val,s,mid);
+    else insert(t[o].rs,t[pre].rs,val,mid+1,e);
+}
+int queryVal(int lo,int ro,int k,int s=1,int e=n)
+{
+    if(s==e)return s;
+    int left_sum=t[t[ro].ls].val - t[t[lo].ls].val;
+    int mid=(s+e)>>1;
+    if(k<=left_sum)return queryVal(t[lo].ls,t[ro].ls,k,s,mid);
+    return queryVal(t[lo].rs,t[ro].rs,k-left_sum,mid+1,e);
+}
+void work()
+{
+    ll q;cin>>n>>q;
+    for(int i=1;i<=n;++i)cin>>a[i];
+    for(int i=1;i<=n;++i)X.push_back(a[i]);
+    sort(X.begin(),X.end());
+    X.erase(unique(X.begin(),X.end()),X.end());
+    for(int i=1;i<=n;++i)insert(rt[i],rt[i-1],bin(a[i]));
+    while(q--)
+    {
+        int l,r,k;cin>>l>>r>>k;
+        cout<<X[queryVal(rt[l-1],rt[r],k)-1]<<'\n';
+    }
+}
+int main() {
+    int _=1;
+    //std::cin>>_;
+    while(_--)work();
+    return 0;
+}
+
+45. qp&sm.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+ll a, b, p;
+
+
+//模板片段
+
+
+ll qp(ll a, ll b, ll mod) // quick power
+{
+    a %= mod;
+    ll res = 1;
+    while (b)
+    {
+        if (b & 1)
+            res = (res * a) % mod;
+        b >>= 1;
+        a = (a * a) % mod;
+    }
+    return res;
+}
+ll sm(ll a, ll b, ll mod) // slow mul
+{
+    a %= mod;
+    ll res = 0;
+    while (b)
+    {
+        if (b & 1)
+            res = (res + a) % mod;
+        b >>= 1;
+        a = (a + a) % mod;
+    }
+    return res;
+}
+
+
+
+
+void work()
+{
+    cin >> a >> b >> p;
+    cout << a << "^" << b << " mod " << p << "=" << qp(a, b, p);
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+46. regex.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+#define pair <int, int> PII
+#define debug(x) cout << #x << '=' << x << '\n'
+
+void work()
+{
+    string s = "123";
+    cout << regex_match(s, regex("\\d+")) << '\n';
+    string s1 = "123_Abc";
+    smatch m;
+    regex pattern("(\\d+)_(.{3})");
+    regex_match(s1, m, pattern);
+    for (int i = 0; i < m.size(); ++i)
+    {
+        cout << m[i] << '\n';
+        string s2 = "";
+    }
+    cout << regex_match(s1, regex("123_abc", regex::icase)) << '\n';
+    cout << regex_match(s1, regex("123_abc")) << '\n';
+
+    int a[4];
+    string ss = "123 456 789 110";
+    smatch res;
+    regex pattern1("(\\d+)");
+    int idx = 0;
+    string tmp;
+    string::const_iterator iterStart = ss.begin();
+    string::const_iterator iterEnd = ss.end();
+    while (regex_search(iterStart, iterEnd, res, pattern1))
+    {
+        a[idx] = stoi(res[0]);
+        idx++;
+        iterStart = res[0].second;
+    }
+
+    for (int i : a)
+        cout << i << ' ' << '\n';
+
+    string str = "HEHE_2020";
+    regex pattern2("(.{2})(.{2})_(\\d{4})");
+    cout << regex_replace(str, pattern2, "$1$3_$2") << '\n';
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+47. SDC.cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 5e3 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<ll, ll> PAIR;
+//差分约束系统
+struct Edge
+{
+    ll x, w;
+};
+vector<Edge> g[N];
+ll n, d[N];
+bool spfa()
+{
+    for(int i=1;i<=n;++i)d[i]=INF;
+    bitset<N>inq;
+    queue<int>q;
+    q.push(0);
+    inq[0]=1;
+    vector<int>cnt(n+1);
+    while(!q.empty()){
+        int x=q.front();
+        q.pop();
+        inq[x]=0;
+        for(const auto &[y,w]:g[x]){
+            if(d[y]>d[x]+w){
+                if(++cnt[y]>=n)return 0;
+                d[y]=d[x]+w;
+                if(!inq[y])q.push(y),inq[y]=1;
+            }
+        }
+     }
+    return 1;
+}
+void solve()
+{
+    int m;
+    cin >> n >> m;
+    for (int i = 0; i <= n; ++i)
+        g[i].clear();
+    for (int i = 1; i <= m; ++i)
+    {
+        int op;
+        cin >> op;
+        ll x, y, w;
+        if (op == 1)
+        {
+            cin >> x >> y >> w;
+            g[y].pb({x, w});
+        }
+        else if (op == 2)
+        {
+            cin >> x >> y >> w;
+            g[x].pb({y, -w});
+        }
+        else
+        {
+            cin >> x >> y;
+            g[x].pb({y, 0});
+            g[y].pb({x, 0});
+        }
+    }
+    // 2.建立虚拟源点
+    for (int i = 1; i <= n; ++i)
+        g[0].pb({i, 0});
+    if(spfa()){
+        //不存在负环
+        cout<<"YES\n";
+        // for(int i=1;i<=n;++i)
+        //     cout<<d[i]-d[1]<<" \n"[i==n];
+    }
+    else
+    {
+        cout<<"NO\n";
+    }
+
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+48. SegTree(add).cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+#define PII pair<int, int>
+#define debug(x) cout << #x << '=' << x << '\n'
+const int mx = 2e5 + 9;
+ll n, q, a[mx], op;
+ll t[mx << 2], lz[mx << 2];
+void update(ll s, ll e, ll o, ll x)
+{
+    t[o] += (e - s + 1) * x;
+    lz[o] += x;
+}
+void pushup(int v)
+{
+    t[v] = t[v << 1] + t[v << 1 | 1];
+}
+void pushdown(ll s = 1, ll e = n, ll o = 1)
+{
+    ll mid = (s + e) >> 1, ls = o << 1, rs = o << 1 | 1;
+    update(s, mid, ls, lz[o]);
+    update(mid + 1, e, rs, lz[o]);
+    lz[o] = 0;
+}
+void build(ll s = 1, ll e = n, ll o = 1)
+{
+    if (s == e)
+        return t[o] = a[s], void();//线段树就是个完全二叉树，底层的叶子节点对应数组元素，所以它的值就是 a[s]。
+    ll mid = (s + e) >> 1;
+    build(s, mid, o << 1), build(mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+void add(ll l, ll r, ll x, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e)
+        return update(s, e, o, x), void();
+    pushdown(s, e, o);
+    int mid = (s + e) >> 1;
+    if (mid >= l)
+        add(l, r, x, s, mid, o << 1);
+    if (mid + 1 <= r)
+        add(l, r, x, mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+ll query(ll l, ll r, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e)
+        return t[o];
+    pushdown(s, e, o);
+    ll mid = (s + e) >> 1;
+    ll res = 0;
+    if (mid >= l)
+        res += query(l, r, s, mid, o << 1);
+    if (mid + 1 <= r)
+        res += query(l, r, mid + 1, e, o << 1 | 1);
+    return res;
+}
+void work()
+{
+    cin >> n >> q;
+    for (int i = 1; i <= n; ++i)
+        cin >> a[i];
+    build();
+
+    while (q--)
+    {
+        cin >> op;
+        if (op == 1)
+        {
+            ll l, r, x;
+            cin >> l >> r >> x;
+            add(l, r, x);
+        }
+        else if (op == 2)
+        {
+            ll l, r;
+            cin >> l >> r;
+            cout << query(l, r) << '\n';
+        }
+    }
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+49. SegTree(EX).cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+#define PII pair<int, int>
+#define debug(x) cout << #x << '=' << x << '\n'
+const int mx = 2e5 + 9;
+const ll mod = 998244353;
+ll n, q, a[mx], op;
+ll mul[mx << 2], add[mx << 2], t[mx << 2];
+ll mo(ll x) { return (x % mod + mod) % mod; }
+void update(ll s, ll e, ll o, ll k, ll x)
+{
+    t[o] = mo(mo(t[o] * k) + mo(x * (e - s + 1)));
+    mul[o] = mo(mul[o] * k);
+    add[o] = mo(mo(add[o] * k) + x);
+}
+void pushup(ll v)
+{
+    t[v] = mo(t[v << 1] + t[v << 1 | 1]);
+}
+void pushdown(ll s = 1, ll e = n, ll o = 1)
+{
+    if (mul[o] == 1 && add[o] == 0) return;
+    ll mid = (s + e) >> 1, ls = o << 1, rs = o << 1 | 1;
+    update(s, mid, ls, mul[o], add[o]);
+    update(mid + 1, e, rs, mul[o], add[o]);
+    mul[o] = 1, add[o] = 0;
+}
+void build(ll s = 1, ll e = n, ll o = 1)
+{
+    mul[o]=1;
+    if (s == e)
+        return t[o] = a[s]%mod, void(); // 线段树就是个完全二叉树，底层的叶子节点对应数组元素，所以它的值就是 a[s]。
+        //如果题目有要求要取模，那么只需要在a[s]处取模即可return t[o] = a[s], void();
+    ll mid = (s + e) >> 1;
+    build(s, mid, o << 1), build(mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+void modify(ll l, ll r,ll k, ll x, ll s = 1, ll e = n,  ll o = 1)
+{
+    if (l <= s && r >= e)
+        return update(s, e, o, k, x), void();
+    pushdown(s, e, o);
+    ll mid = (s + e) >> 1;
+    if (mid >= l)
+        modify(l, r,k,x, s, mid,  o << 1);
+    if (mid + 1 <= r)
+        modify(l, r, k,x, mid + 1, e,  o << 1 | 1);
+    pushup(o);
+}
+ll query(ll l, ll r, ll s = 1, ll e = n,  ll o = 1)
+{
+    if (l <= s && r >= e)
+        return t[o];
+    pushdown(s, e, o);
+    ll mid = (s + e) >> 1;
+    ll res = 0;
+    if (mid >= l)
+        res = mo(res + query(l, r, s, mid, o << 1));
+    if (mid + 1 <= r)
+        res = mo(res +query(l, r, mid + 1, e, o << 1 | 1));
+    return res;
+}
+void work()
+{
+    cin >> n >> q;
+    for (int i = 1; i <= n; ++i)
+        cin >> a[i];
+    build();
+    while (q--)
+    {
+        cin >> op;
+        if (op == 1)
+        {
+            ll l, r, x;
+            cin >> l >> r >> x;
+            modify(l, r,1, x);
+        }
+        else if (op == 2)
+        {
+            ll l, r, x;
+            cin >> l >> r >> x;
+            modify(l, r, x,0);
+        }
+        else if (op == 3)
+        {
+            ll l, r, x;
+            cin >> l >> r >> x;
+            modify(l, r, 0,x);
+        }
+        else if (op == 4)
+        {
+            ll l, r;
+            cin >> l >> r;
+            cout << query(l, r) << '\n';
+        }
+    }
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+50. SegTree(MaxMin).cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+#define PII pair<int, int>
+#define debug(x) cout << #x << '=' << x << '\n'
+const int mx = 2e5 + 9;
+const ll inf=2e18;
+ll n, q, a[mx], op;//极值线段树
+ll tMax[mx << 2], tMin[mx << 2], lz[mx << 2];
+
+void update(ll s, ll e, ll o, ll x)
+{
+    tMax[o] += x, tMin[o] += x, lz[o] += x;
+}
+void pushup(ll v)
+{
+    tMax[v] = max(tMax[v << 1], tMax[v << 1 | 1]);
+    tMin[v] = min(tMin[v << 1], tMin[v << 1 | 1]);
+}
+void pushdown(ll s = 1, ll e = n, ll o = 1)
+{
+    ll mid = (s + e) >> 1, ls = o << 1, rs = o << 1 | 1;
+    update(s, mid, ls, lz[o]);
+    update(mid + 1, e, rs, lz[o]);
+    lz[o] = 0;
+}
+void build(ll s = 1, ll e = n, ll o = 1)
+{
+    if (s == e)
+        return tMax[o] =tMin[o]= a[s], void();
+    ll mid = (s + e) >> 1;
+    build(s, mid, o << 1), build(mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+void add(ll l, ll r, ll x, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e)
+        return update(s, e, o, x), void();
+    pushdown(s, e, o);
+    int mid = (s + e) >> 1;
+    if (mid >= l)
+        add(l, r, x, s, mid, o << 1);
+    if (mid + 1 <= r)
+        add(l, r, x, mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+ll queryMax(ll l, ll r, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e)
+        return tMax[o];
+    pushdown(s, e, o);
+    ll mid = (s + e) >> 1;
+    ll res = -inf;
+    if (mid >= l)
+        res =max(res, queryMax(l, r, s, mid, o << 1));
+    if (mid + 1 <= r)
+        res = max(res,queryMax(l, r, mid + 1, e, o << 1 | 1));
+    return res;
+}
+ll queryMin(ll l, ll r, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e)
+        return tMin[o];
+    pushdown(s, e, o);
+    ll mid = (s + e) >> 1;
+    ll res = inf;
+    if (mid >= l)
+        res = min(res,queryMin(l, r, s, mid, o << 1));
+    if (mid + 1 <= r)
+        res = min(res,queryMin(l, r, mid + 1, e, o << 1 | 1));
+    return res;
+}
+void work()
+{
+    cin >> n >> q;
+    for (int i = 1; i <= n; ++i)
+        cin >> a[i];
+    build();
+
+    while (q--)
+    {
+        cin >> op;
+        if (op == 1)
+        {
+            ll l, r, x;
+            cin >> l >> r >> x;
+            add(l, r, x);
+        }
+        else if (op == 2)
+        {
+            ll l, r;
+            cin >> l >> r;
+            cout << queryMax(l, r)<<' '<<queryMin(l,r) << '\n';
+        }
+    }
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+51. SegTree(Weight).cpp
+------------------
+/*blank*/
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long//一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+#define PII pair<int,int>
+#define debug(x) cout<<#x<<'='<<x<<'\n'
+const int mx=2e5+1;
+ll q,op,l,r,x,t[mx<<2],n=mx;//非可持续性权值线段树
+void pushup(int v)
+{
+    t[v]=t[v<<1]+t[v<<1|1];
+}
+void insert(ll v,ll s=1,ll e=n,ll o=1)
+{
+    if(s==e)return t[o]++,void();
+    ll mid=(s+e)>>1;
+    if(v<=mid)insert(v,s,mid,o<<1);
+    else insert(v,mid+1,e,o<<1|1);
+    pushup(o);
+}
+ll queryCnt(ll l,ll r,ll s=1,ll e=n,ll o=1)//查询大小在[l,r]的元素的个数之和
+{
+    if(l<=s&&r>=e)return t[o];
+    ll mid=(s+e)>>1;
+    ll res=0;
+    if(max(s,l)<=min(mid,e))res+=queryCnt(l,r,s,mid,o<<1);
+    if(max(mid+1,l)<=min(r,e))res+=queryCnt(l,r,mid+1,e,o<<1|1);
+    return res;
+}
+ll queryVal(ll k,ll s=1,ll e=n,ll o=1)//查询集合中kth小的元素
+{
+    if(s==e)return s;
+    ll ls=t[o<<1];
+    ll mid=(s+e)>>1;
+    if(k<=ls)return queryVal(k,s,mid,o<<1);
+    return queryVal(k-ls,mid+1,e,o<<1|1);
+}
+void work()
+{
+    cin>>q;
+    while(q--)
+    {
+        cin>>op;
+        if(op==1)
+        {
+            cin>>x;
+            insert(x);
+        }
+        else if(op==2)
+        {
+            cin>>l>>r;
+            cout<<queryCnt(l,r)<<'\n';
+        }
+        else if(op==3)
+        {
+            cin>>x;
+            cout<<queryVal(x)<<'\n';
+        }
+    }
+}
+int main()
+{
+ios::sync_with_stdio(0);
+cin.tie(0);
+cout.tie(0);
+int _=1;
+//cin >> _;
+//sc("%d",&_);
+while (_--)work();
+return 0;
+}
+
+52. SegTree(XOR).cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long // 一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+#define PII pair<int, int>
+#define debug(x) cout << #x << '=' << x << '\n'
+const int mx = 2e5 + 9;
+ll n, q, a[mx], op;//异或线段树
+ll t[mx << 2], lz[mx << 2];
+void update(ll s, ll e, ll o, ll x)
+{
+    t[o] ^= ((e - s + 1) & 1) ? x : 0;
+    lz[o] ^= x;
+}
+void pushup(int v)
+{
+    t[v] = t[v << 1] ^ t[v << 1 | 1];
+}
+void pushdown(ll s = 1, ll e = n, ll o = 1)
+{
+    ll mid = (s + e) >> 1, ls = o << 1, rs = o << 1 | 1;
+    update(s, mid, ls, lz[o]);
+    update(mid + 1, e, rs, lz[o]);
+    lz[o] = 0;
+}
+void build(ll s = 1, ll e = n, ll o = 1)
+{
+    if (s == e)
+        return t[o] = a[s], void();
+    ll mid = (s + e) >> 1;
+    build(s, mid, o << 1), build(mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+void add(ll l, ll r, ll x, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e)
+        return update(s, e, o, x), void();
+    pushdown(s, e, o);
+    int mid = (s + e) >> 1;
+    if (mid >= l)
+        add(l, r, x, s, mid, o << 1);
+    if (mid + 1 <= r)
+        add(l, r, x, mid + 1, e, o << 1 | 1);
+    pushup(o);
+}
+ll query(ll l, ll r, ll s = 1, ll e = n, ll o = 1)
+{
+    if (l <= s && r >= e)
+        return t[o];
+    pushdown(s, e, o);
+    ll mid = (s + e) >> 1;
+    ll res = 0;
+    if (mid >= l)
+        res ^= query(l, r, s, mid, o << 1);
+    if (mid + 1 <= r)
+        res ^= query(l, r, mid + 1, e, o << 1 | 1);
+    return res;
+}
+void work()
+{
+    cin >> n >> q;
+    for (int i = 1; i <= n; ++i)
+        cin >> a[i];
+    build();
+
+    while (q--)
+    {
+        cin >> op;
+        if (op == 1)
+        {
+            ll l, r, x;
+            cin >> l >> r >> x;
+            add(l, r, x);
+        }
+        else if (op == 2)
+        {
+            ll l, r;
+            cin >> l >> r;
+            cout << query(l, r) << '\n';
+        }
+    }
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int _ = 1;
+    // cin >> _;
+    // sc("%d",&_);
+    while (_--)
+        work();
+    return 0;
+}
+
+53. SG.cpp
+------------------
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+vector<int> v; // 存储1和所有质数
+const int N = 1e5 + 5;
+void init(int n)
+{
+    bitset<N> vis;
+    vis[0] = vis[1] = 1;
+    for (int i = 2; i <= n; ++i)
+        for (int j = i * i; j <= n; j += i)
+            vis[j] = 1;
+    v.push_back(1);
+    for (int i = 2; i <= n; ++i)
+        if (!vis[i])
+            v.push_back(i);
+}
+map<int, int> sg;
+i64 getSG(int x)
+{
+    if (!x)
+        return 0;
+    if (sg.count(x))
+        return sg[x];
+    unordered_set<i64> st;
+    for (const auto &i : v)
+    {
+        if (i <= x)
+            st.insert(getSG(x - i));
+        else
+            break;
+    }
+    for (int i = 0;; ++i)
+    {
+        if (!st.count(i))
+            return sg[x] = i;
+    }
+}
+void work()
+{
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    int ans = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        cin >> a[i];
+        ans^=a[i];
+    }
+    cout<<(ans%4?"YES":"NO")<<'\n';
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    init(1000);
+        // for (int i = 1; i <= 100; ++i)
+        //     cout << getSG(i) << ' ';
+    int t;
+    cin >> t;
+    while (t--)
+        work();
+}
+
+54. Sort.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64=long long;
+using u64=unsigned long long;
+/*归并排序
+void merge(i64 a[], i64 l, i64 r)
+{
+    if (r - l < 1)
+        return;
+    i64 mid = (l + r) >> 1;
+    merge(a, l, mid);
+    merge(a, mid + 1, r);
+    i64 i = l, j = mid + 1;
+    for (i64 k = l; k <= r; k++)
+    {
+        if (j > r || i <= mid && a[i] <= a[j])
+            b[k] = a[i++];
+        else
+            cnt += mid - i + 1,b[k] = a[j++];
+    }
+    for (i64 k = l; k <= r; k++)
+        a[k] = b[k];
+}
+*/
+void work()
+{
+    
+}
+int main() {
+ios::sync_with_stdio(0);
+cin.tie(0);
+int t=1;
+cin >> t;
+while(t--)
+work();
+}
+
+55. st.cpp
+------------------
+/*blank*/
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long//一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+const int N = 1e5 + 9;
+const ll inf = 2e18;
+const int T = 25;
+ll stMax[N][T], stMin[N][T], stGcd[N][T];
+ll a[N], lg2[N];
+int gcd(int a, int b) {
+    return b == 0 ? a : gcd(b, a % b);
+}
+ll getMax(int l, int r)
+{
+   int k = lg2[r - l + 1];
+   return max(stMax[l][k], stMax[r - (1 << k) + 1][k]);
+}
+ll getMin(int l, int r)
+{
+   int k = lg2[r - l + 1] ;
+   return min(stMin[l][k], stMin[r - (1 << k) + 1][k]);
+}
+ll getGcd(int l, int r)
+{
+   int k = lg2[r - l + 1];
+   return gcd(stGcd[l][k], stGcd[r - (1 << k) + 1][k]);
+}
+void work()
+{
+   int n, q;
+   cin >> n >> q;
+   for (int i = 1; i <= n; ++i)
+       cin >> a[i];
+   // 初始化长度为1的情况
+   for (int i = 1; i <= n; ++i)
+       stMax[i][0] = stMin[i][0] = stGcd[i][0] = a[i];
+   for (int j = 1; j <= lg2[n]; ++j)
+   {
+       for (int i = 1; i + (1 << j) - 1 <= n; ++i)
+       {
+           stMax[i][j] = max(stMax[i][j - 1], stMax[i + (1 << (j - 1))][j - 1]);
+           stMin[i][j] = min(stMin[i][j - 1], stMin[i + (1 << (j - 1))][j - 1]);
+           stGcd[i][j] = gcd(stGcd[i][j - 1], stGcd[i + (1 << (j - 1))][j - 1]);
+       }
+   }
+   while (q--)
+   {
+       int l, r;
+       cin >> l >> r;
+       cout << getMax(l, r) << ' ' << getMin(l, r) << ' ' << getGcd(l, r) << '\n';
+   }
+}
+int main()
+{
+ios::sync_with_stdio(0);
+cin.tie(0);
+cout.tie(0);
+for(int i = 2; i < N; i++) lg2[i] = lg2[i >> 1] + 1;
+int _=1;
+cin >> _;
+//sc("%d",&_);
+while (_--)work();
+return 0;
+}
+
+56. StressTest.cpp
+------------------
+/*
+#!/bin/bash
+
+g++ -std=c++17 -O2 -Wall $1.cpp -o main
+g++ -std=c++17 -O2 -Wall brute.cpp -o brute
+g++ -std=c++17 -O2 -Wall rand.cpp -o rand
+
+test_count=100
+passed=0
+
+
+for ((i=1; i<=$test_count; i++))
+do
+    
+    ./rand > in.txt
+    
+    
+    ./main < in.txt > out.txt
+    ./brute < in.txt > ans.txt
+    
+        cat in.txt
+    if diff -q out.txt ans.txt > /dev/null; then
+        echo -e "\033[32m测试 #$i AC\033[0m"
+        ((passed++))
+    else
+        echo -e "\033[31m测试 #$i WA\033[0m"
+        cat in.txt
+        cat out.txt
+        echo -e "\n\033[36m[正确输出]:\033[0m"
+        cat ans.txt
+        exit 1
+    fi
+done
+
+echo -e "\033[34m测试完成，通过率: $passed/$test_count\033[0m"
+*/
+
+57. String-Hash.cpp
+------------------
+/*blank*/
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long//一时偷懒不收敛，乱开ll终遭谴
+#define ull unsigned long long//一时偷懒不收敛，乱开ll终遭谴
+#define sc scanf
+#define pr printf
+#define PII pair<int,int>
+#define debug(x) cout<<#x<<'='<<x<<'\n'
+const int mx=1e6+9;
+const ull base=1771;
+char s[mx];
+ull b[mx],h[mx],hr[mx];
+ull gh(int l,int r)
+{
+    return h[r]-h[l-1]*b[r-l+1];
+}
+ull ghr(int l,int r)
+{
+    return h[l]-h[r+1]*b[r-l+1];
+}
+void work()
+{
+    int n;
+    cin>>n;
+    cin>>s+1;
+    b[0]=1;
+    for(int i=1;i<=n;++i)
+    {
+        b[i]=b[i-1]*base;
+        h[i]=h[i-1]*base+s[i]-'a'+1;
+    }
+    for(int i=n;i>=1;--i)hr[i]=hr[i+1]*base+s[i]-'a'+1;
+    int q;
+    cin>>q;
+    while(q--)
+    {
+        int l,r,x,y;
+        cin>>l>>r>>x>>y;
+        cout<<(gh(l,r)==gh(x,y)?"YES\n":"NO\n");
+    }
+}
+int main()
+{
+ios::sync_with_stdio(0);
+cin.tie(0);
+cout.tie(0);
+int _=1;
+//cin >> _;
+//sc("%d",&_);
+while (_--)work();
+return 0;
+}
+
+58. Tarjan(DG_SCC).cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+const int N = 5e5 + 5;
+vector<int> g[N];
+int dfn[N], low[N], stk[N], top, idx;
+int col[N], tot, cnt[N];
+bitset<N> ins;
+vector<vector<int>> ans;
+void tarjan(int x)
+{
+    dfn[x] = low[x] = ++idx;
+    stk[++top] = x;
+    ins[x] = 1;
+    for (const auto &y : g[x])
+    {
+        if (!dfn[y])
+        {
+            tarjan(y);
+            low[x] = min(low[x], low[y]);
+        }
+        else if (ins[y])
+            low[x] = min(low[x], dfn[y]);
+    }
+    if (low[x] == dfn[x])
+    {
+        tot++;
+        vector<int> tmpv;
+        while (1)
+        {
+            int y = stk[top--];
+            col[y] = tot;
+            cnt[tot]++;
+            ins[y] = 0;
+            tmpv.push_back(y);
+            if (y == x)
+                break;
+        }
+        ans.push_back(tmpv);
+    }
+}
+void work()
+{
+    int n, m;
+    cin >> n >> m;
+    for (int i = 1; i <= m; ++i)
+    {
+        int x, y;
+        cin >> x >> y;
+        g[x].push_back(y);
+    }
+    for (int i = 0; i < n; ++i)
+        if (!dfn[i])
+            tarjan(i);
+    cout<<ans.size()<<'\n';
+    reverse(begin(ans),end(ans));
+    for(const auto&i:ans)
+    {
+        cout<<i.size()<<' ';
+        for(int j=0;j<i.size();++j)
+        cout<<i[j]<<" \n"[j==i.size()-1];
+    }
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+59. Tarjan(UDG_B).cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+const int N = 5e5 + 5;
+vector<pair<int,int>> g[N];
+int dfn[N], low[N], es, idx;
+vector<int> ans;
+bool f[N];
+struct edge {
+    int u, v;
+};
+vector<edge>side;
+void tarjan(int x, int fa)
+{
+    dfn[x] = low[x] = ++idx;
+    for (const auto &y : g[x])
+    {
+        int v=y.first,id=y.second;
+        if (id == fa)
+            continue;
+        if (!dfn[v])
+        {
+            tarjan(v,id);
+            low[x] = min(low[x], low[v]);
+            if(low[v]>dfn[x]){es++;f[id]=1;}
+        }
+        else
+            low[x] = min(low[x], dfn[v]);
+    }
+}
+void work()
+{
+    es = 0, idx = 0;
+    int n, m;
+    cin >> n >> m;
+    for (int i = 1; i <= n; ++i)
+    {
+        g[i].clear();
+        dfn[i] = low[i] = 0;
+    }
+    for (int i = 0; i < m; ++i)
+    {
+        int x, y;
+        cin >> x >> y;
+        side.push_back({x,y});
+        g[x].push_back({y,i});
+        g[y].push_back({x,i});
+        f[i]=0;
+    }
+   idx = 0;
+    for(int i=1;i<=n;++i)if(!dfn[i])tarjan(i,-1);
+    for (int i = 0; i < m; ++i)
+        if (f[i])
+            cout << side[i].u << ' ' << side[i].v << '\n';
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+60. Tarjan(UDG_CV).cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+const int N = 2e5 + 5;
+vector<int> g[N];
+int dfn[N], low[N], cut, idx;
+vector<int> ans;
+void tarjan(int x, int fa)
+{
+    dfn[x] = low[x] = ++idx;
+    int chi = 0;
+    bool f = 0;
+    for (const auto &y : g[x])
+    {
+        if (y == fa)
+            continue;
+        if (!dfn[y])
+        {
+            chi++;
+            tarjan(y, x);
+            low[x] = min(low[x], low[y]);
+            if (low[y] >= dfn[x] && fa != 0)
+                f = 1;
+        }
+        else
+            low[x] = min(low[x], dfn[y]);
+    }
+    if ((fa == 0 && chi >= 2) || (fa != 0 && f))
+    {
+        ans.push_back(x);
+        cut++;
+    }
+}
+set<pair<int, int>> st;
+void work()
+{
+    cut = 0, idx = 0;
+    ans.clear();
+    int n, m;
+    cin >> n >> m;
+    for (int i = 1; i <= n; ++i)
+    {
+        g[i].clear();
+        dfn[i] = low[i] = 0;
+    }
+    for (int i = 1; i <= m; ++i)
+    {
+        int x, y;
+        cin >> x >> y;
+        g[x].push_back(y);
+        g[y].push_back(x);
+    }
+    for (int i = 1; i <= n; ++i)
+        if (!dfn[i])
+            tarjan(i, 0);
+    sort(ans.begin(), ans.end());
+    cout << ans.size() << '\n';
+    for (int i = 0; i < ans.size(); ++i)
+        cout << ans[i] << " \n"[i == ans.size() - 1];
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+61. Tarjan(UDG_Cycle).cpp
+------------------
+/*🫵😉👍*/
+#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <stack>
+#include <math.h>
+#include <stdlib.h>
+#include <queue>
+#include <set>
+#include <string.h>
+#include <string>
+#include <stdio.h>
+#include <deque>
+#include <numeric>
+using namespace std;
+#define ll long long
+#define lll __uint128_t
+#define ld long double
+#define ull unsigned long long
+#define re register
+#define il inline
+#define fi first
+#define SZ(x) ((int)(x).size())
+#define se second
+#define all(v) v.begin(), v.end()
+#define pb push_back
+#define lowbit(x) (x & -x)
+#define fixed(x) fixed << setprecision(x)
+#define lcm(x, y) x *y / __gcd(x, y)
+#define endl "\n"
+#define debug(x) cout << #x << " = " << (x) << endl;
+#define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
+const ll N = 2e5 + 100, M = 1e6 + 10, base = 13331, mod = 1e9 + 7;
+const int T = 20;
+const ull INF = 1e18;
+const double pie = acos(-1), eps = 1e-8;
+int dir[] = {0, 1, 0, -1, 0};
+const int dx[] = {1, 1, 1, 0, 0, -1, -1, -1};
+const int dy[] = {1, 0, -1, -1, 0, 1, -1};
+typedef pair<int, int> PAIR;
+// Tarjan求环
+vector<int> g[N];
+int dfn[N], low[N], stk[N], idx, ans, top;
+bitset<N> ins;
+void tarjan(int x, int fa)
+{
+    dfn[x] = low[x] = ++idx;
+    stk[++top] = x;
+    ins[x] = 1;
+    for (const auto &y : g[x])
+    {
+        if (y == fa)
+            continue;
+        if (!dfn[y])
+        {
+            tarjan(y, x);
+            low[x] = min(low[x], low[y]);
+        }
+        else if (ins[y])
+        {
+            low[x] = min(low[x], dfn[y]);
+        }
+    }
+    if (low[x] == dfn[x])
+    {
+        int cnt = 0;
+        while (stk[top + 1] != x)
+        {
+            cnt++;
+            ins[stk[top--]] = 0;
+        }
+        if (cnt > 1)
+        {
+            ans = cnt;
+            return;
+        }
+    }
+}
+void solve()
+{
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; ++i)
+    {
+        g[i].clear();
+        stk[i] = dfn[i] = low[i] = 0;
+        ins[i] = 0;
+    }
+    stk[n + 1] = 0;
+    ans = idx = top = 0;
+    for (int i = 1; i <= n; ++i)
+    {
+        int x, y;
+        cin >> x >> y;
+        g[x].pb(y);
+        g[y].pb(x);
+    }
+    tarjan(1, 0);
+    cout << ans << '\n';
+}
+signed main()
+{
+    io;
+    ll _ = 1;
+    cin >> _;
+    while (_--)
+        solve();
+    return 0;
+}
+
+62. tddif.cpp
+------------------
+/*blank*/
+#include <bits/stdc++.h>
+
+using i64 = long long;
+const int mx = 1001;
+int n, m;
+int dif[mx][mx];
+void work()
+{
+    std::cin >> n >> m;
+    for (int i = 1; i <= m; ++i)
+    {
+        int x1, y1, x2, y2;
+        std::cin >> x1 >> y1 >> x2 >> y2;
+        dif[x1][y1]++;
+        dif[x2 + 1][y1]--;
+        dif[x1][y2 + 1]--;
+        dif[x2 + 1][y2 + 1]++;
+    }
+    for (int i = 1; i <= n; ++i)
+    {
+        for (int j = 1; j <= n; ++j)
+        {
+            dif[i][j] = dif[i - 1][j] + dif[i][j - 1] - dif[i - 1][j - 1] + dif[i][j];
+        }
+    }
+    for (int i = 1; i <= n; ++i)
+    {
+        for (int j = 1; j <= n; ++j)
+        {
+            std::cout << dif[i][j] << ' ';
+        }
+        std::cout << '\n';
+    }
+}
+int main()
+{
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int _ = 1;
+    // std::cin>>_;
+    while (_--)
+        work();
+    return 0;
+}
+
+63. Trie(01).cpp
+------------------
+/*  
+功能：  
+动态插入前缀异或字典树，查询给定前缀内第k小的与x的异或值。  
+
+思路：  
+用可持久化字典树（Trie）维护前缀内值，  
+支持动态插入和在线求解第k小异或值。
+
+时间复杂度：
+- 插入：O(logC)，C为数值上限（这里最多31位）
+- 查询：O(logC)
+- 排序：O(QlogQ)
+总复杂度：O((N+Q)logC)
+
+*/
+
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long
+const ll N = 2e5 + 100;
+
+// 数组和常量声明
+int a[N];
+struct node {
+    int val;        // 当前节点数量
+    int son[2];     // 子节点编号 0 / 1
+} t[N << 5];        // Trie节点数量开到4倍
+
+int idx = 1;        // Trie节点编号
+
+// 查询结构体
+struct Q {
+    int id, t, x, k;
+};
+vector<Q> que;      // 查询数组
+int ans[N];         // 答案数组
+
+// 插入操作，将x插入到Trie中
+void insert(int x) {
+    int o = 0;
+    t[o].val++;
+    for (int i = 30; i >= 0; --i) {
+        int y = x >> i & 1;
+        int &u = t[o].son[y];
+        if (!u) u = ++idx;
+        o = u;
+        t[o].val++;
+    }
+}
+
+// 查询操作：查询前缀内第k小的与x异或值
+int getVal(int x, int k) {
+    int o = 0, res = 0;
+    for (int i = 30; i >= 0; --i) {
+        int y = x >> i & 1;
+        int u = t[o].son[y];
+        int v = t[o].son[!y];
+
+        // 如果当前位匹配数量足够，继续走
+        if (u && t[u].val >= k) o = u;
+        else {
+            // 选反位，更新答案
+            o = v;
+            k -= u ? t[u].val : 0;
+            res |= (1 << i);
+        }
+    }
+    return res;
+}
+
+void solve() {
+    int n, q;
+    cin >> n >> q;
+    for (int i = 1; i <= n; ++i) cin >> a[i];
+    for (int i = 1; i <= q; ++i) {
+        int t, x, k;
+        cin >> t >> x >> k;
+        que.push_back({i, t, x, k});
+    }
+
+    // 排序，按时间t升序，id升序
+    sort(que.begin(), que.end(), [](const Q &u, const Q &v) {
+        return u.t != v.t ? u.t < v.t : u.id < v.id;
+    });
+
+    int now = 0;
+    // 依次处理查询
+    for (const auto &qe : que) {
+        while (now < qe.t) insert(a[++now]); // 动态插入
+        ans[qe.id] = getVal(qe.x, qe.k);
+    }
+
+    // 输出结果
+    for (int i = 1; i <= q; ++i) cout << ans[i] << '\n';
+}
+
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    ll _ = 1;
+    while (_--) solve();
+    return 0;
+}
+
+64. Trie(prefix).cpp
+------------------
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+const int N = 5e5 + 5;
+// 数组和常量声明
+struct node
+{
+    int val;                  // 当前节点数量
+    node *ch[26] = {nullptr}; // 子节点编号 a / z
+}; 
+void del(node *cur)
+{
+    for (int i = 0; i < 26; ++i)
+        if (cur->ch[i] != nullptr)
+            del(cur->ch[i]);
+    delete cur;
+}
+vector<int> getdiv(int x)
+{
+    vector<int> ans;
+    for (int i = 1; i * i <= x; ++i)
+    {
+        if (x % i == 0)
+        {
+            ans.push_back(i);
+            if (i * i != x)
+                ans.push_back(x / i);
+        }
+    }
+    return ans;
+}
+void solve()
+{
+    int n;
+    cin >> n;
+    vector<i64> term(n + 1,0LL);//处理当前状态的总评分
+    node *root = new node();
+    i64 ans = 0;
+    int cur_i=0;
+    for (int i = 1; i <= n; ++i)
+    {
+        string s;
+        cin >> s;
+        node *cur = root;
+        for (auto &ch : s)
+        {
+            int c = ch - 'a';
+            if (cur->ch[c] == nullptr)
+                cur->ch[c] = new node();
+            cur = cur->ch[c];
+            cur->val=cur->val+1;
+            vector<int> dv = getdiv(cur->val);
+            for (auto &d : dv)
+            {
+                if (d > n)  
+                    continue;
+                i64 pas = term[d];
+                term[d] +=(i64) d;
+                if (d <= cur_i)
+                    ans ^= (pas^term[d] );
+            }
+        }
+        ans ^= term[i];
+        cout << ans << " \n"[i ==n];
+        cur_i=i;
+    }
+    del(root);
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0); 
+    int t;
+    cin >> t;
+    while (t--)
+        solve();
+}
+
+65. Trie(string).cpp
+------------------
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+struct node
+{
+    bool end=0;
+    int leaves;
+    node *ch[26] = {nullptr};
+};
+void del(node *root)
+{
+    for (int i = 0; i < 26; ++i)
+    {
+        if (root->ch[i])
+            del(root->ch[i]);
+    }
+    delete root;
+}
+void insert(node *root, string s)
+{
+    node *cur = root;
+    for (auto &c : s)
+    {
+        int t = c - 'a';
+        if (!cur->ch[t])
+            cur->ch[t] = new node();
+        cur = cur->ch[t];
+        cur->leaves++;
+    }
+    cur->end=1;
+}
+int querypre(node *root, string pre)//查询前缀个数
+{
+    node *cur = root;
+    for (auto &c : pre)
+    {
+        int t = c - 'a';
+        if (!cur->ch[t])
+            return 0;
+        cur = cur->ch[t];
+    }
+    return cur->leaves;
+}
+bool ser(node *root, string s)//查询单词是否存在
+{
+    node *cur = root;
+    for (auto &c : s)
+    {
+        int t = c - 'a';
+        if (!cur->ch[t])
+            return 0;
+        cur = cur->ch[t];
+    }
+    return cur->end;
+}
+void work()
+{
+    int n;
+    cin >> n;
+    node *root = new node();
+    for(int i=1;i<=n;++i)
+    {
+        string s;
+        cin>>s;
+        insert(root,s);
+    }
+    unordered_map<string,int>mp;
+    int q;cin>>q;
+    while(q--)
+    {
+        string s;cin>>s;
+        if(mp[s])
+        {
+            cout<<"REPEAT"<<'\n';
+        }
+        else if(ser(root,s))
+        {
+            cout<<"OK"<<'\n';
+            mp[s]=1;
+        }
+        else 
+        {
+            cout<<"WRONG"<<'\n';
+        }
+    }
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    // cin >> t;
+    while (t--)
+        work();
+}
+
+66. Year.cpp
+------------------
+/*ordinary.exe*/
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = long long;
+using u64 = unsigned long long;
+// 判断闰年
+bool isLeap(int y)
+{
+    return (y % 400 == 0) || (y % 4 == 0 && y % 100 != 0);
+    // xujc
+    //  return (y % 400 == 0 && y % 3200 != 0) || (y % 4 == 0 && y % 100 != 0);
+}
+// 每月天数
+int mdays[13][2] = {
+    {0, 0}, {31, 31}, {28, 29}, {31, 31}, {30, 30}, {31, 31}, {30, 30}, {31, 31}, {31, 31}, {30, 30}, {31, 31}, {30, 30}, {31, 31}};
+// 计算从公元0年1月1日到y:m:d的总天数
+int dateToDays(int y, int m, int d)
+{
+    int days = 0;
+    for (int i = 1; i < y; ++i)
+        days += isLeap(i) ? 366 : 365;
+    for (int i = 1; i < m; ++i)
+        days += mdays[i][isLeap(y)];
+    days += d;
+    return days;
+}
+// 从天数推日期
+void daysToDate(int total, int &y, int &m, int &d)
+{
+    y = 1;
+    while (true)
+    {
+        int dy = isLeap(y) ? 366 : 365;
+        if (total > dy)
+            total -= dy, ++y;
+        else
+            break;
+    }
+    m = 1;
+    while (1)
+    {
+        int dm = mdays[m][isLeap(y)];
+        if (total > dm)
+            total -= dm, ++m;
+        else
+            break;
+    }
+    d = total;
+}
+// 格式化输出 yyyy:mm:dd（补零）
+string fmt(int x, int len = 2)
+{
+    string s = to_string(x);
+    while ((int)s.size() < len)
+        s = "0" + s;
+    return s;
+}
+
+void work()
+{
+    string s1, s2;
+    cin >> s1 >> s2;
+    if (s2.find(':') != string::npos)
+    {
+        //计算两日期之间天数差
+        int y1, m1, d1, y2, m2, d2;
+        sscanf(s1.c_str(), "%d:%d:%d", &y1, &m1, &d1);
+        sscanf(s2.c_str(), "%d:%d:%d", &y2, &m2, &d2);
+        int ans = abs(dateToDays(y1, m1, d1) - dateToDays(y2, m2, d2));
+        cout << ans << "\n";
+    }
+    else
+    {
+        //加上天数后求新日期
+        int day = stoi(s2);
+        int y, m, d;
+        sscanf(s1.c_str(), "%d:%d:%d", &y, &m, &d);
+        int total = dateToDays(y, m, d) + day;
+        int Y, M, D;
+        daysToDate(total, Y, M, D);
+        cout << fmt(Y, 4) << ":" << fmt(M, 2) << ":" << fmt(D, 2) << "\n";
+    }
+}
+int main()
+{
+    // ios::sync_with_stdio(0);
+    // cin.tie(0);
+    int t = 1;
+    cin >> t;
+    while (t--)
+        work();
+}
+//67.MathGeo
+const int N = 1e3 + 10;
+const int mod = 1e9 + 7;
+typedef pair<int, int> PII;
+
+//--------------------------------------------------------------
+const double eps = 1e-9;
+const double pi = acos(-1);
+inline double sqr(double x) { return x * x; } // 平方
+int sign(double x)
+{
+	if (fabs(x) < eps)
+		return 0;
+	if (x > 0)
+		return 1;
+	return -1;
+} // 符号
+struct point
+{
+	double x, y;
+	point() {}
+	point(double a, double b) : x(a), y(b) {}
+	friend point operator+(const point &a, const point &b)
+	{
+		return point(a.x + b.x, a.y + b.y);
+	}
+	friend point operator-(const point &a, const point &b)
+	{
+		return point(a.x - b.x, a.y - b.y);
+	}
+	friend bool operator==(const point &a, const point &b)
+	{
+		return !sign(a.x - b.x) && !sign(a.y - b.y);
+	}
+	friend point operator*(const point &a, const double &b)
+	{
+		return point(a.x * b, a.y * b);
+	}
+	friend point operator*(const double &a, const point &b)
+	{
+		return point(a * b.x, a * b.y);
+	}
+	friend point operator/(const point &a, const double &b)
+	{
+		return point(a.x / b, a.y / b);
+	}
+	// 向量模长
+	double norm()
+	{
+		return sqrt(sqr(x) + sqr(y));
+	}
+};
+
+struct line
+{
+	point a, b;
+	line() {}
+	line(point x, point y) : a(x), b(y) {}
+};
+
+double det(const point &a, const point &b)
+{
+	return a.x * b.y - a.y * b.x;
+} // 叉积 判断两点共线 ,绝对值等于两个向量所构成的平行四边形面积
+
+double dot(const point &a, const point &b)
+{
+	return a.x * b.x + a.y * b.y;
+} // 点积
+
+double dist(const point &a, const point &b)
+{
+	return (a - b).norm();
+} // 两点距离
+
+point rotate_point(const point &a, const point &p, double A)
+{
+	double tx = p.x - a.x, ty = p.y - a.y;
+	return point(a.x + tx * cos(A) - ty * sin(A), a.y + tx * sin(A) + ty * cos(A));
+} // p 点 绕 a 点逆时针旋转 A 弧度
+
+int toleft(const point &p, const point &a, const point &b)
+{
+	return sign(det(b - a, p - a));
+	// 1 左 0 上 -1 右
+} // 只适用凸多边形
+
+// 判断点 p 是否在线段 st 上(包括端点)
+bool point_on_segment(point p, point s, point t)
+{
+	return sign(det(p - s, t - s)) == 0 && sign(dot(p - s, p - t)) <= 0;
+}
+
+bool parallel(line a, line b)
+{
+	return !sign(det(a.a - a.b, b.a - b.b));
+} // 判断两个直线是否平
+bool line_make_point(line a, line b, point &res)
+{
+	if (parallel(a, b))
+		return 0;
+	double s1 = det(a.a - b.a, b.b - b.a);
+	double s2 = det(a.b - b.a, b.b - b.a);
+	res = (s1 * a.b - s2 * a.a) / (s1 - s2);
+	return 1;
+} //
+int n, m;
+struct node
+{
+	double x, y, dis;
+};
+vector<node> ans[N];
+void work()
+{
+	cin >> n >> m;
+	double xs, ys, xt, yt;
+	cout << fixed << setprecision(10);
+	cin >> xs >> ys >> xt >> yt;
+	point s, t;
+	s = {xs, ys}, t = {xt, yt};
+	line l = {s, t};
+	vector<point> p(n + 1);
+	for (int i = 1; i <= n; ++i)
+		cin >> p[i].x >> p[i].y;
+	point now;
+	for (int i = 1; i <= n; ++i)
+	{
+		for (int j = i + 1; j <= n; ++j)
+		{
+			auto p1 = p[i];
+			auto p2 = p[j];
+			if (toleft(s, p1, p2) * toleft(t, p1, p2) > 0)
+				continue;
+			line r = {p1, p2};
+			line_make_point(l, r, now);
+			ans[i].emplace_back(now.x, now.y, dist(now, s));
+			ans[j].emplace_back(now.x, now.y, dist(now, s));
+		}
+	}
+	int h, k;
+	for (int i = 1; i <= n; ++i)
+		sort(ans[i].begin(), ans[i].end(),
+			 [&](node a, node b)
+			 { return a.dis < b.dis; });
+	for (int i = 1; i <= m; ++i)
+	{
+		cin >> h >> k;
+		if (ans[h].size() < k)
+			cout << "-1\n";
+		else cout << ans[h][k - 1].x << ' ' << ans[h][k - 1].y << '\n';
+	}
+}
