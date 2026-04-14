@@ -1,12 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 #define ll long long
 #define endl '\n'
 #define io ios::sync_with_stdio(false), cin.tie(0), cout.tie(0)
-
 const int N = 1e5 + 10;
-
 struct node {
     int v;        // 值
     int fa;       // 父节点编号
@@ -26,7 +23,6 @@ void ins(int &u, int v, int fa, int dep) {
     if (v < t[u].v) ins(t[u].lc, v, u, dep + 1);
     else ins(t[u].rc, v, u, dep + 1);
 }
-
 // 查找值对应的节点编号
 int find(int u, int v) {
     if (!u) return 0;
@@ -34,7 +30,6 @@ int find(int u, int v) {
     if (v < t[u].v) return find(t[u].lc, v);
     return find(t[u].rc, v);
 }
-
 // 获取兄弟节点的值
 int getxd(int u) {
     int f = t[u].fa;
@@ -43,7 +38,6 @@ int getxd(int u) {
     if (t[f].rc == u && t[f].lc) return t[t[f].lc].v;
     return 0;
 }
-
 // 中序遍历
 void inorder(int u) {
     if (!u) return;
@@ -51,7 +45,6 @@ void inorder(int u) {
     cout << t[u].v << ' ';
     inorder(t[u].rc);
 }
-
 // 前序遍历
 void preorder(int u) {
     if (!u) return;
@@ -59,7 +52,6 @@ void preorder(int u) {
     preorder(t[u].lc);
     preorder(t[u].rc);
 }
-
 // 后序遍历
 void postorder(int u) {
     if (!u) return;
@@ -67,7 +59,6 @@ void postorder(int u) {
     postorder(t[u].rc);
     cout << t[u].v << ' ';
 }
-
 // 找最小值（子树最左）
 int findmin(int u) {
     while (t[u].lc) u = t[u].lc;
@@ -79,7 +70,6 @@ int findmax(int u) {
     while (t[u].rc) u = t[u].rc;
     return u;
 }
-
 // 删除操作
 int rmv(int u, int v) {
     if (!u) return 0;
@@ -144,7 +134,6 @@ void solve() {
         cout << x << " 前驱: " << (pre ? t[pre].v : -1) << " 后继: " << (suc ? t[suc].v : -1) << endl;
     }
 }
-
 int main() {
     io;
     solve();
